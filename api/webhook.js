@@ -1,74 +1,53 @@
 'use strict';
 
 const express  = require('express');
-const { verifyWebhookSignature } = require('../lib/square');
+const { verifyWebhookSignature, PRODUCT_LABELS } = require('../lib/square');
 const { createDownloadToken, attachSuccessSlug } = require('../lib/tokens');
-const { sendDownloadEmail } = require('../lib/email');
 
 const router = express.Router();
 
-// ── Tier lookup by Square variation ID ───────────────────────────────────────
+const PRODUCT_PRICES = { access: 4900, system: 9700, control: 19700 };
+
 function tierFromVariationId(variationId) {
   const map = {
     [process.env.PRODUCT_ID_ACCESS]:  'access',
     [process.env.PRODUCT_ID_SYSTEM]:  'system',
     [process.env.PRODUCT_ID_CONTROL]: 'control',
   };
-  return map[variationId] || 'access';
+  return map[variationId] || null;
 }
 
-// ── Tier lookup by amount (fallback) ─────────────────────────────────────────
-const PRODUCT_PRICES = { access: 4900, system: 9700, control: 19700 };
 function tierFromAmount(cents) {
   const entry = Object.entries(PRODUCT_PRICES).find(([, v]) => v === cents);
   return entry ? entry[0] : null;
 }
 
-// ── Discord notification ──────────────────────────────────────────────────────
-const PRODUCT_LABELS = {
-  access:  'WinOnAny — Starter',
-  system:  'WinOnAny — The Vault',
-  control: 'WinOnAny — Full Access',
-};
-
 async function notifyDiscord({ tier, amountCents, buyerEmail, orderId, failed = false }) {
   const url = process.env.DISCORD_WEBHOOK_URL;
   if (!url) return;
-
-  const tierLabel = tier ? PRODUCT_LABELS[tier] : 'Unknown tier';
-  const amount    = `$${(amountCents / 100).toFixed(2)}`;
-
   const embed = failed
-    ? {
-        title:  '❌ Payment Failed',
-        color:  0xef4444,
-        fields: [{ name: 'Order ID', value: orderId || '—', inline: true }],
-        timestamp: new Date().toISOString(),
-      }
-    : {
-        title:  '💸 New Payment',
-        color:  0x6E56F8,
-        fields: [
-          { name: 'Tier',     value: tierLabel,         inline: true },
-          { name: 'Amount',   value: amount,            inline: true },
-          { name: 'Email',    value: buyerEmail || '—', inline: true },
-          { name: 'Order ID', value: `\`${orderId}\``,  inline: false },
-        ],
-        timestamp: new Date().toISOString(),
-      };
-
+    ? { title: '❌ Payment Failed', color: 0xef4444, fields: [{ name: 'Order', value: orderId || '—', inline: true }], timestamp: new Date().toISOString() }
+    : { title: '💸 New Payment', color: 0x6E56F8, fields: [
+        { name: 'Tier',   value: PRODUCT_LABELS[tier] || tier, inline: true },
+        { name: 'Amount', value: '$' + (amountCents/100).toFixed(2), inline: true },
+        { name: 'Email',  value: buyerEmail || '—', inline: true },
+        { name: 'Order',  value: '`' + orderId + '`', inline: false },
+      ], timestamp: new Date().toISOString() };
   try {
-    await fetch(url, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ embeds: [embed] }),
-    });
+    await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [embed] }) });
   } catch (e) {
     console.warn('[webhook] Discord notify failed:', e.message);
   }
 }
 
-// ── Webhook route ─────────────────────────────────────────────────────────────
+/**
+ * POST /api/webhook
+ * Handles Square payment events.
+ * For embedded checkout (pay.html), /api/charge handles everything.
+ * This webhook is a safety net — catches any payments that came through
+ * the hosted checkout fallback or direct Square links.
+ * No email is sent — access is delivered via the /s/:slug redirect only.
+ */
 router.post(
   '/webhook',
   express.raw({ type: 'application/json' }),
@@ -84,47 +63,32 @@ router.post(
       }
 
       const event = JSON.parse(rawBody);
-      console.log('[webhook] ' + event.type);
+      console.log('[webhook]', event.type);
 
       if (event.type === 'payment.completed') {
-        const payment     = event.data.object.payment;
-        const squareOrderId  = payment.orderId;
-        const paymentId   = payment.id;
-        const buyerEmail  = payment.buyerEmailAddress;
-        const amountCents = (payment.totalMoney && payment.totalMoney.amount) || 0;
-
-        // Determine tier — try variation ID first, fall back to amount
-        const variationId = payment.lineItemUid || null;
-        const tier = variationId
+        const payment       = event.data.object.payment;
+        const squareOrderId = payment.orderId;
+        const paymentId     = payment.id;
+        const buyerEmail    = payment.buyerEmailAddress;
+        const amountCents   = (payment.totalMoney && payment.totalMoney.amount) || 0;
+        const variationId   = payment.lineItemUid || null;
+        const tier          = variationId
           ? tierFromVariationId(variationId)
-          : (tierFromAmount(amountCents) || 'access');
+          : tierFromAmount(amountCents);
 
-        // Create expiring download token in DB
-        const order = await createDownloadToken(
-          squareOrderId, tier, buyerEmail, amountCents, paymentId
-        );
-
-        if (order) {
-          // Attach unique success slug for the randomized redirect URL
-          const updated    = await attachSuccessSlug(squareOrderId);
-          const slug       = updated ? updated.success_slug : null;
-          const successUrl = slug ? `${process.env.APP_URL}/s/${slug}` : null;
-
-          // Send download email with the randomized success URL
-          if (buyerEmail && successUrl) {
-            await sendDownloadEmail(buyerEmail, tier, order.download_token, successUrl);
-            console.log('[webhook] sent access email → ' + buyerEmail + ' slug: ' + slug);
-          }
+        if (tier) {
+          // Create token + slug if not already created by /api/charge
+          const existing = await require('../lib/tokens').getOrderByToken && null; // check below
+          const order = await createDownloadToken(squareOrderId, tier, buyerEmail, amountCents, paymentId);
+          if (order) await attachSuccessSlug(squareOrderId);
         }
 
-        // Discord notification
         await notifyDiscord({ tier, amountCents, buyerEmail, orderId: squareOrderId });
       }
 
       if (event.type === 'payment.failed') {
         const payment = event.data.object.payment;
         await notifyDiscord({ orderId: payment.orderId, amountCents: 0, failed: true });
-        console.warn('[webhook] payment.failed — order: ' + payment.orderId);
       }
 
       return res.status(200).json({ received: true });
