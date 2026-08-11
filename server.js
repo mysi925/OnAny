@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 3000;
 // ── Cookie parser ─────────────────────────────────────────────────────────────
 app.use(cookieParser());
 
-// ── Raw body for webhook — must come before express.json ──────────────────────
+// ── Raw body for webhook ──────────────────────────────────────────────────────
 app.use('/api/webhook', express.raw({ type: 'application/json' }));
 
 // ── JSON for all other API routes ─────────────────────────────────────────────
@@ -33,7 +33,18 @@ app.use((req, res, next) => {
   next();
 });
 
-// ── Public Square config — keeps app ID + location ID off static HTML ─────────
+// ── winonany.win — serve checkout page for ALL requests ───────────────────────
+app.use((req, res, next) => {
+  const host = (req.headers.host || '').toLowerCase();
+  if (host.includes('winonany.win')) {
+    // API calls from pay.html still need to work
+    if (req.path.startsWith('/api/')) return next();
+    return res.sendFile(path.join(__dirname, 'public/pay.html'));
+  }
+  next();
+});
+
+// ── Public Square config ──────────────────────────────────────────────────────
 app.get('/api/config', (req, res) => {
   res.json({
     squareAppId:      process.env.SQUARE_APP_ID      || '',
@@ -59,17 +70,12 @@ app.get('/portal',  (req, res) => res.sendFile(path.join(__dirname, 'public/port
 app.get('/expired', (req, res) => res.sendFile(path.join(__dirname, 'public/expired.html')));
 
 // ── Randomized success route /s/:slug ─────────────────────────────────────────
-// After payment completes, buyer lands here with a unique per-transaction URL.
-// We look up the order by slug, inject the download token server-side so it
-// never appears in the URL, then serve the success page.
 app.get('/s/:slug', async (req, res) => {
   try {
     const order = await getOrderBySlug(req.params.slug);
-
     if (!order || !isTokenValid(order)) {
       return res.sendFile(path.join(__dirname, 'public/expired.html'));
     }
-
     const html      = fs.readFileSync(path.join(__dirname, 'public/success.html'), 'utf8');
     const injection = `<script>
 window.__WOA__ = {
@@ -78,19 +84,17 @@ window.__WOA__ = {
   slug:  ${JSON.stringify(req.params.slug)}
 };
 </script>`;
-
     const injected = html.replace('</head>', injection + '</head>');
     res.setHeader('Content-Type', 'text/html');
     res.setHeader('Cache-Control', 'no-store');
     return res.send(injected);
-
   } catch (err) {
     console.error('[/s/:slug] error:', err.message);
     return res.sendFile(path.join(__dirname, 'public/expired.html'));
   }
 });
 
-// ── SPA fallback ──────────────────────────────────────────────────────────────
+// ── SPA fallback (winonany.com only) ─────────────────────────────────────────
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });
