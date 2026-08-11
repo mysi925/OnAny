@@ -43,8 +43,14 @@ app.use('/api', webhookRoute);
 app.use('/api', authRoute);
 app.use('/api', downloadRoute);
 
-// ── Static assets (css, fonts, images, pdfs) ──────────────────────────────────
-app.use(express.static(path.join(__dirname, 'public')));
+// ── Apple Pay domain verification ─────────────────────────────────────────────
+app.get('/.well-known/apple-developer-merchantid-domain-association', (req, res) => {
+  res.setHeader('Content-Type', 'application/octet-stream');
+  res.sendFile(path.join(__dirname, 'public/.well-known/apple-developer-merchantid-domain-association'));
+});
+
+// ── Static assets (css, fonts, images) ────────────────────────────────────────
+app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'allow' }));
 
 // ── Page routes ────────────────────────────────────────────────────────────────
 const page = (file) => (req, res) =>
