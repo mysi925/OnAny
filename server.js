@@ -52,7 +52,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const page = (file) => (req, res) =>
   res.sendFile(path.join(__dirname, 'public', file));
 
-app.get('/',        (req, res) => res.redirect(302, '/pay'));
+app.get('/',        (req, res) => res.redirect(302, process.env.MARKETING_URL || 'https://winonany.com'));
 app.get('/pay',     page('pay.html'));
 app.get('/login',   page('login.html'));
 app.get('/portal',  page('portal.html'));
