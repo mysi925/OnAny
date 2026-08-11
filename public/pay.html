@@ -355,7 +355,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
           }).then(function(r){ return r.json(); });
 
           if(charge.success){
-            window.location.href = '/success?tier=' + tier;
+            window.location.href = charge.redirectUrl;
           } else {
             throw new Error(charge.error || 'Payment failed — try again.');
           }
