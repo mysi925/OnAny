@@ -110,6 +110,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .err.show{display:block}
 
 .pay-note{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-2);text-align:center;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:7px}
+#google-pay-button,#apple-pay-button{display:none;width:100%;min-height:48px;margin-bottom:10px}
+.pay-divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--muted-2);font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.pay-divider::before,.pay-divider::after{content:"";flex:1;height:1px;background:var(--line)}
 .pay-note svg{width:10px;height:10px;flex-shrink:0}
 
 .back-link{display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2);margin-top:clamp(16px,3vw,24px);transition:color .25s}
@@ -228,6 +231,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       /* ── right: payment form ── */
       '<div class="card" id="payCard">' +
         '<div class="card-inner">' +
+          /* Native pay buttons — hidden until Square confirms availability */
+          '<div id="native-pay-wrap" style="display:none">' +
+            '<div id="google-pay-button"></div>' +
+            '<div id="apple-pay-button"></div>' +
+            '<div class="pay-divider"><span>or pay with card</span></div>' +
+          '</div>' +
           '<div class="form-section">' +
             '<label class="form-label" for="card-container">Card details</label>' +
             '<div id="card-container"></div>' +
@@ -256,10 +265,26 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     err.classList.remove('show');
   }
 
+  /* Dollar amounts must match lib/square.js PRODUCT_PRICES (/100) */
+  var DOLLAR_AMOUNTS = { access: '29.99', system: '59.99', control: '99.99' };
+
+  async function submitCharge(sourceId){
+    var charge = await fetch('/api/charge', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ sourceId: sourceId, tier: tier }),
+    }).then(function(r){ return r.json(); });
+
+    if(charge.success){
+      window.location.href = charge.redirectUrl;
+    } else {
+      throw new Error(charge.error || 'Payment failed — try again.');
+    }
+  }
+
   /* ── init Square Web Payments SDK ── */
   (async function init(){
     try {
-      /* Fetch app config from server — keeps Square keys off the static file */
       var cfgRes = await fetch('/api/config');
       var cfg    = await cfgRes.json();
 
@@ -268,7 +293,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
         return;
       }
 
-      /* Validate config before handing to Square */
       if(!cfg.squareAppId || !cfg.squareLocationId){
         showErr(
           'Checkout config missing — contact support. ' +
@@ -288,39 +312,97 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
         return;
       }
 
-      /* Card styling to match the dark theme */
+      /* ── Payment request (used for Apple Pay + Google Pay) ── */
+      var paymentRequest = payments.paymentRequest({
+        countryCode:  'US',
+        currencyCode: 'USD',
+        total: {
+          amount: DOLLAR_AMOUNTS[tier] || '29.99',
+          label:  'WinOnAny',
+        },
+      });
+
+      var nativeShown = false;
+
+      /* ── Google Pay ── */
+      try {
+        var googlePay = await payments.googlePay(paymentRequest);
+        await googlePay.attach('#google-pay-button');
+        document.getElementById('google-pay-button').style.display = 'block';
+        nativeShown = true;
+
+        document.getElementById('google-pay-button').addEventListener('click', async function(){
+          clearErr();
+          try {
+            var result = await googlePay.tokenize();
+            if(result.status !== 'OK'){
+              throw new Error((result.errors && result.errors[0]) ? result.errors[0].message : 'Google Pay failed.');
+            }
+            await submitCharge(result.token);
+          } catch(e){
+            showErr(e.message || 'Google Pay failed — try again.');
+          }
+        });
+      } catch(e){
+        console.log('[pay] Google Pay unavailable:', e.message);
+      }
+
+      /* ── Apple Pay ── */
+      try {
+        var applePay = await payments.applePay(paymentRequest);
+        await applePay.attach('#apple-pay-button');
+        document.getElementById('apple-pay-button').style.display = 'block';
+        nativeShown = true;
+
+        document.getElementById('apple-pay-button').addEventListener('click', async function(){
+          clearErr();
+          try {
+            var result = await applePay.tokenize();
+            if(result.status !== 'OK'){
+              throw new Error((result.errors && result.errors[0]) ? result.errors[0].message : 'Apple Pay failed.');
+            }
+            await submitCharge(result.token);
+          } catch(e){
+            showErr(e.message || 'Apple Pay failed — try again.');
+          }
+        });
+      } catch(e){
+        console.log('[pay] Apple Pay unavailable:', e.message);
+      }
+
+      if(nativeShown){
+        document.getElementById('native-pay-wrap').style.display = 'block';
+      }
+
+      /* ── Card — Square-supported style properties only ──
+         Rules: no backgroundColor, no font-family fallbacks,
+         use .is-focus (not .is-focused) ── */
       var card = await payments.card({
         style: {
           '.input-container': {
-            borderColor:     'rgba(255,255,255,.12)',
-            borderRadius:    '0px',
-            backgroundColor: '#101016',
+            borderColor:  'rgba(255,255,255,.12)',
+            borderRadius: '0px',
           },
-          '.input-container.is-focused': {
+          '.input-container.is-focus': {
             borderColor: '#6E56F8',
           },
           '.input-container.is-error': {
             borderColor: '#ef4444',
           },
           'input': {
-            color:       '#F2F2F4',
-            fontFamily:  '"IBM Plex Mono", ui-monospace, monospace',
-            fontSize:    '14px',
-            fontWeight:  '400',
+            color:      '#F2F2F4',
+            fontSize:   '14px',
+            fontWeight: '400',
           },
           'input::placeholder': {
             color: '#5C5C66',
           },
           '.message-text': {
-            color:      '#85858F',
-            fontFamily: '"IBM Plex Mono", ui-monospace, monospace',
-            fontSize:   '11px',
+            color:    '#85858F',
+            fontSize: '11px',
           },
           '.message-text.is-error': {
             color: '#F87171',
-          },
-          '.message-icon': {
-            color: '#85858F',
           },
           '.message-icon.is-error': {
             color: '#F87171',
@@ -329,8 +411,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       });
 
       await card.attach('#card-container');
-
-      /* Enable the button once card is ready */
       btn.disabled = false;
 
       btn.addEventListener('click', async function(){
@@ -339,7 +419,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
         clearErr();
 
         try {
-          /* Tokenize the card */
           var result = await card.tokenize();
 
           if(result.status !== 'OK'){
@@ -347,18 +426,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
             throw new Error(msg);
           }
 
-          /* Send token to backend to charge */
-          var charge = await fetch('/api/charge', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ sourceId: result.token, tier: tier }),
-          }).then(function(r){ return r.json(); });
-
-          if(charge.success){
-            window.location.href = charge.redirectUrl;
-          } else {
-            throw new Error(charge.error || 'Payment failed — try again.');
-          }
+          await submitCharge(result.token);
 
         } catch(e){
           btn.disabled = false;
