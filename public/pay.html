@@ -197,9 +197,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   var data    = TIERS[tier];
   var root    = document.getElementById('root');
 
-  /* ── not found ── */
+  /* ── no valid tier — send back to pricing ── */
   if(!data){
-    root.innerHTML = '<div class="not-found"><h1>Invalid tier.</h1><p>That link doesn\'t match any plan.</p><a href="/#pricing">← See pricing</a></div>';
+    window.location.replace('https://winonany.com/#pricing');
     return;
   }
 
