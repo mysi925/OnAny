@@ -260,14 +260,33 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   (async function init(){
     try {
       /* Fetch app config from server — keeps Square keys off the static file */
-      var cfg = await fetch('/api/config').then(function(r){ return r.json(); });
+      var cfgRes = await fetch('/api/config');
+      var cfg    = await cfgRes.json();
 
       if(!window.Square){
-        showErr('Payment system failed to load — refresh and try again.');
+        showErr('Payment system script failed to load. Check your connection and refresh.');
         return;
       }
 
-      var payments = Square.payments(cfg.squareAppId, cfg.squareLocationId);
+      /* Validate config before handing to Square */
+      if(!cfg.squareAppId || !cfg.squareLocationId){
+        showErr(
+          'Checkout config missing — contact support. ' +
+          '(appId: ' + (cfg.squareAppId  ? 'OK' : 'MISSING') + ', ' +
+          'locationId: ' + (cfg.squareLocationId ? 'OK' : 'MISSING') + ')'
+        );
+        console.error('[pay] /api/config returned:', cfg);
+        return;
+      }
+
+      var payments;
+      try {
+        payments = Square.payments(cfg.squareAppId, cfg.squareLocationId);
+      } catch(sqErr){
+        showErr('Square init failed: ' + (sqErr.message || sqErr));
+        console.error('[pay] Square.payments() threw:', sqErr);
+        return;
+      }
 
       /* Card styling to match the dark theme */
       var card = await payments.card({
@@ -336,7 +355,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
           }).then(function(r){ return r.json(); });
 
           if(charge.success){
-            window.location.href = charge.redirectUrl || ('/success?tier=' + tier);
+            window.location.href = '/success?tier=' + tier;
           } else {
             throw new Error(charge.error || 'Payment failed — try again.');
           }
@@ -349,7 +368,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       });
 
     } catch(e){
-      showErr('Checkout failed to initialize. Refresh and try again.');
+      var msg = e && e.message ? e.message : String(e);
+      showErr('Checkout failed to initialize: ' + msg);
       console.error('[pay] init error:', e);
     }
   })();
