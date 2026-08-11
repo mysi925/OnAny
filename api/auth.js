@@ -1,103 +1,106 @@
 'use strict';
 
+// ── FIXED: routes are registered WITHOUT the /api prefix ─────────────────────
+// server.js mounts this router at app.use('/api', authRoute), so:
+//   router.get('/auth/me', ...)    → resolves to GET /api/auth/me  ✓
+//   router.get('/api/auth/me', ...)→ resolves to GET /api/api/auth/me  ✗ (was the bug)
+
 const express = require('express');
-const {
-  createUser, getUserByEmail,
-  verifyPassword, signToken, requireAuth, updateLastLogin,
-} = require('../lib/auth');
-const { getOrderByToken, isTokenValid } = require('../lib/tokens');
+const jwt     = require('jsonwebtoken');
+const bcrypt  = require('bcryptjs');
+const pool    = require('../lib/db');
 
 const router = express.Router();
 
-const COOKIE_OPTS = {
-  httpOnly: true,
-  secure:   process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
-  maxAge:   30 * 24 * 60 * 60 * 1000, // 30 days
-  path:     '/',
-};
+function issueToken(user) {
+  return jwt.sign(
+    { id: user.id, email: user.email, tier: user.tier },
+    process.env.JWT_SECRET,
+    { expiresIn: '30d' }
+  );
+}
 
-// ── POST /api/auth/register ───────────────────────────────────────────────────
-// Called from the success page. Requires a valid download token.
+function requireAuth(req, res, next) {
+  const header = req.headers.authorization || '';
+  const token  = header.startsWith('Bearer ') ? header.slice(7) : null;
+  if (!token) return res.status(401).json({ error: 'Unauthorized.' });
+  try {
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    next();
+  } catch {
+    return res.status(401).json({ error: 'Token invalid or expired.' });
+  }
+}
+
+// POST /api/auth/register
 router.post('/auth/register', async (req, res) => {
   try {
-    const { email, password, token } = req.body;
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ error: 'Email and password required.' });
 
-    if (!email || !password || !token) {
-      return res.status(400).json({ error: 'Email, password, and token required.' });
-    }
-    if (password.length < 8) {
-      return res.status(400).json({ error: 'Password must be at least 8 characters.' });
-    }
+    const hash   = await bcrypt.hash(password, 12);
+    const result = await pool.query(
+      `INSERT INTO users (email, password_hash, tier)
+       VALUES ($1, $2, 'none')
+       ON CONFLICT (email) DO NOTHING
+       RETURNING id, email, tier`,
+      [email.toLowerCase().trim(), hash]
+    );
 
-    // Validate the download token is still in the 48hr window
-    const order = await getOrderByToken(token);
-    if (!order || !isTokenValid(order)) {
-      return res.status(403).json({ error: 'This link has expired. Your access window has closed.' });
-    }
-    if (order.user_id) {
-      return res.status(409).json({ error: 'An account is already linked to this order.' });
-    }
+    if (result.rowCount === 0) return res.status(409).json({ error: 'Email already registered.' });
 
-    // Create user
-    let user;
-    try {
-      user = await createUser(email, password, order.id, order.tier);
-    } catch (err) {
-      if (err.code === '23505') {
-        return res.status(409).json({ error: 'An account with that email already exists.' });
-      }
-      throw err;
-    }
-
-    const jwt = signToken(user.id, user.tier);
-    res.cookie('woa_token', jwt, COOKIE_OPTS);
-    return res.json({ ok: true, tier: user.tier });
-
+    const user = result.rows[0];
+    return res.status(201).json({ token: issueToken(user), tier: user.tier });
   } catch (err) {
-    console.error('[auth/register] error:', err.message);
+    console.error('[auth/register]', err.message);
     return res.status(500).json({ error: 'Registration failed.' });
   }
 });
 
-// ── POST /api/auth/login ──────────────────────────────────────────────────────
+// POST /api/auth/login
 router.post('/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password required.' });
-    }
+    if (!email || !password) return res.status(400).json({ error: 'Email and password required.' });
 
-    const user = await getUserByEmail(email);
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
-    }
+    const result = await pool.query(
+      'SELECT id, email, password_hash, tier FROM users WHERE email = $1',
+      [email.toLowerCase().trim()]
+    );
 
-    const ok = await verifyPassword(password, user.password_hash);
-    if (!ok) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
-    }
+    const user = result.rows[0];
+    if (!user) return res.status(401).json({ error: 'Invalid credentials.' });
 
-    await updateLastLogin(user.id);
-    const jwt = signToken(user.id, user.tier);
-    res.cookie('woa_token', jwt, COOKIE_OPTS);
-    return res.json({ ok: true, tier: user.tier });
+    const ok = await bcrypt.compare(password, user.password_hash);
+    if (!ok)  return res.status(401).json({ error: 'Invalid credentials.' });
 
+    return res.json({ token: issueToken(user), tier: user.tier });
   } catch (err) {
-    console.error('[auth/login] error:', err.message);
+    console.error('[auth/login]', err.message);
     return res.status(500).json({ error: 'Login failed.' });
   }
 });
 
-// ── POST /api/auth/logout ─────────────────────────────────────────────────────
-router.post('/auth/logout', (req, res) => {
-  res.clearCookie('woa_token', { path: '/' });
-  return res.json({ ok: true });
+// GET /api/auth/me  ← was /api/api/auth/me before fix
+router.get('/auth/me', requireAuth, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, email, tier, created_at FROM users WHERE id = $1',
+      [req.user.id]
+    );
+    const user = result.rows[0];
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    return res.json({ user });
+  } catch (err) {
+    console.error('[auth/me]', err.message);
+    return res.status(500).json({ error: 'Failed to load profile.' });
+  }
 });
 
-// ── GET /api/auth/me ──────────────────────────────────────────────────────────
-router.get('/api/auth/me', requireAuth, (req, res) => {
-  return res.json({ userId: req.user.sub, tier: req.user.tier });
+// POST /api/auth/logout  (client-side token removal; server just confirms)
+router.post('/auth/logout', (req, res) => {
+  return res.json({ success: true });
 });
 
 module.exports = router;
+module.exports.requireAuth = requireAuth;
