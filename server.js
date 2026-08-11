@@ -56,7 +56,14 @@ app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'allow' }));
 const page = (file) => (req, res) =>
   res.sendFile(path.join(__dirname, 'public', file));
 
-app.get('/', page('index.html'));
+app.get('/', (req, res) => {
+  if (req.hostname === 'winonany.com') {
+    // Marketing domain → landing page
+    return res.sendFile(path.join(__dirname, 'public/index.html'));
+  }
+  // Payment domain (winonany.win / Railway subdomain) → checkout
+  return res.redirect(302, '/pay?tier=system');
+});
 app.get('/pay',     page('pay.html'));
 app.get('/login',   page('login.html'));
 app.get('/portal',  page('portal.html'));
