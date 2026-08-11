@@ -6,7 +6,6 @@ const {
   verifyPassword, signToken, requireAuth, updateLastLogin,
 } = require('../lib/auth');
 const { getOrderByToken, isTokenValid } = require('../lib/tokens');
-const { sendWelcomeEmail } = require('../lib/email');
 
 const router = express.Router();
 
@@ -49,11 +48,6 @@ router.post('/auth/register', async (req, res) => {
         return res.status(409).json({ error: 'An account with that email already exists.' });
       }
       throw err;
-    }
-
-    // Send welcome email
-    try { await sendWelcomeEmail(email, order.tier); } catch (e) {
-      console.warn('[auth/register] welcome email failed:', e.message);
     }
 
     const jwt = signToken(user.id, user.tier);
