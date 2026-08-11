@@ -49,10 +49,7 @@ app.get('/.well-known/apple-developer-merchantid-domain-association', (req, res)
   res.sendFile(path.join(__dirname, 'public/.well-known/apple-developer-merchantid-domain-association'));
 });
 
-// ── Static assets (css, fonts, images) ────────────────────────────────────────
-app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'allow' }));
-
-// ── Page routes ────────────────────────────────────────────────────────────────
+// ── Page routes (before static so hostname check fires first) ─────────────────
 const page = (file) => (req, res) =>
   res.sendFile(path.join(__dirname, 'public', file));
 
@@ -68,6 +65,9 @@ app.get('/pay',     page('pay.html'));
 app.get('/login',   page('login.html'));
 app.get('/portal',  page('portal.html'));
 app.get('/expired', page('expired.html'));
+
+// ── Static assets — index:false so express.static never intercepts '/' ────────
+app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'allow', index: false }));
 
 // ── Secure success route ───────────────────────────────────────────────────────
 // Randomised slug prevents direct access — token validated on every request.
