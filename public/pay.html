@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-
 <!-- Square SDK loaded dynamically after /api/config so the correct
      sandbox vs production URL is used — mismatching them causes
      "Checkout failed to initialize" on Square.payments() call. -->
@@ -113,17 +112,14 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .err.show{display:block}
 
 .pay-note{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-2);text-align:center;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:7px}
-.native-pay-btn{
-  display:none;width:100%;height:52px;margin-bottom:10px;
-  align-items:center;justify-content:center;gap:10px;
-  border:0;cursor:pointer;font-size:15px;font-weight:600;
-  font-family:var(--display);letter-spacing:.01em;
-  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
-}
-#google-pay-button{background:#fff;color:#000;}
-#google-pay-button svg{flex-shrink:0}
-#apple-pay-button{background:#000;color:#fff;}
-#apple-pay-button svg{flex-shrink:0}
+#google-pay-button,#apple-pay-button{display:none;width:100%;margin-bottom:10px}
+.tier-tabs{display:flex;border-bottom:1px solid var(--line)}
+.tier-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:13px 8px 11px;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2);background:transparent;border:0;cursor:pointer;transition:color .2s;-webkit-tap-highlight-color:transparent;position:relative}
+.tier-tab::after{content:"";position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--accent);transform:scaleX(0);transition:transform .22s var(--ease)}
+.tier-tab.active{color:var(--accent-lift)}
+.tier-tab.active::after{transform:scaleX(1)}
+.tier-tab+.tier-tab{border-left:1px solid var(--line)}
+.tier-tab .t-price{font-size:13.5px;font-weight:700;color:inherit;font-family:var(--display);letter-spacing:-.02em}
 .pay-divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--muted-2);font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
 .pay-divider::before,.pay-divider::after{content:"";flex:1;height:1px;background:var(--line)}
 .pay-note svg{width:10px;height:10px;flex-shrink:0}
@@ -208,35 +204,52 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     },
   };
 
-  var params  = new URLSearchParams(window.location.search);
-  var tier    = params.get('tier') || '';
-  var data    = TIERS[tier];
-  var root    = document.getElementById('root');
+  /* Dollar amounts must match lib/square.js PRODUCT_PRICES (/100) */
+  var DOLLAR_AMOUNTS = { access: '29.99', system: '59.99', control: '99.99' };
 
-  /* ── no valid tier — send back to pricing ── */
-  if(!data){
-    window.location.replace('https://winonany.com/#pricing');
-    return;
-  }
+  var params    = new URLSearchParams(window.location.search);
+  var initTier  = params.get('tier') || 'system';
+  if(!TIERS[initTier]){ window.location.replace('https://winonany.com/#pricing'); return; }
 
-  var CHK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  var selectedTier = initTier;
+  var root = document.getElementById('root');
+
+  var CHK  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
   var LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
 
-  var feats = data.features.map(function(f){
-    return '<li><span class="chk">'+CHK+'</span>'+f+'</li>';
-  }).join('');
+  /* ── Render dynamic tier info into #tierInfo ── */
+  function renderTierInfo(t) {
+    var d = TIERS[t];
+    var feats = d.features.map(function(f){
+      return '<li><span class="chk">'+CHK+'</span>'+f+'</li>';
+    }).join('');
+    document.getElementById('tierInfo').innerHTML =
+      '<span class="tier-badge">'+d.badge+'</span>' +
+      '<div class="tier-price">$'+d.dollars+'<span class="cents">.'+d.cents+'</span></div>' +
+      '<p class="tier-name">'+d.name+'</p>' +
+      '<p class="tier-sum">'+d.summary+'</p>' +
+      '<div class="div"></div>' +
+      '<ul class="features">'+feats+'</ul>';
+  }
 
+  function tabBtn(key, label, price) {
+    return '<button class="tier-tab'+(initTier===key?' active':'')+'" data-switch="'+key+'">' +
+      '<span>'+label+'</span><span class="t-price">$'+price+'</span>' +
+    '</button>';
+  }
+
+  /* ── Build page shell ── */
   root.innerHTML =
     '<div class="checkout-grid">' +
-      /* ── left: tier summary ── */
+      /* ── left: tier picker + summary ── */
       '<div class="card" id="summaryCard">' +
+        '<div class="tier-tabs" id="tierTabs">' +
+          tabBtn('access',  'Starter',     '29.99') +
+          tabBtn('system',  'The Vault',   '59.99') +
+          tabBtn('control', 'Full Access', '99.99') +
+        '</div>' +
         '<div class="card-inner">' +
-          '<span class="tier-badge">'+data.badge+'</span>' +
-          '<div class="tier-price">$'+data.dollars+'<span class="cents">.'+data.cents+'</span></div>' +
-          '<p class="tier-name">'+data.name+'</p>' +
-          '<p class="tier-sum">'+data.summary+'</p>' +
-          '<div class="div"></div>' +
-          '<ul class="features">'+feats+'</ul>' +
+          '<div id="tierInfo"></div>' +
           '<div class="div"></div>' +
           '<p class="trust">'+LOCK+'One payment. No subscription. Instant access.</p>' +
         '</div>' +
@@ -244,15 +257,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       /* ── right: payment form ── */
       '<div class="card" id="payCard">' +
         '<div class="card-inner">' +
-          /* Native pay buttons — hidden until Square confirms availability */
           '<div id="native-pay-wrap" style="display:none">' +
-            '<button class="native-pay-btn" id="google-pay-button" type="button" aria-label="Pay with Google Pay" style="display:none">' +
-              '<img src="https://pay.google.com/about/static/images/social/google_pay_logo.svg" alt="Google Pay" height="22" style="display:block">' +
-            '</button>' +
-            '<button class="native-pay-btn" id="apple-pay-button" type="button" aria-label="Pay with Apple Pay" style="display:none">' +
-              '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="22" viewBox="0 0 814 1000" fill="#fff"><path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-42.4-150.3-109.2c-52.1-79.4-98.2-207.3-98.2-329.2 0-170.1 111.4-260 221-260 75.5 0 138.1 49.1 185.1 49.1 44.6 0 115.2-52.6 199.2-52.6zm-200.1-175.4c37.5-44.8 64.1-107.2 64.1-169.5 0-8.9-.6-17.9-2.2-25.5-60.5 2.3-132.4 40.2-175.9 91.4-34 37.9-66.5 101.4-66.5 164.6 0 9.5 1.7 19 2.3 22.2 4 .6 10.6 1.7 17.2 1.7 54.1 0 122.5-36.5 161-84.9z"/></svg>' +
-              ' Apple Pay' +
-            '</button>' +
+            '<div id="google-pay-button"></div>' +
+            '<div id="apple-pay-button"></div>' +
             '<div class="pay-divider"><span>or pay with card</span></div>' +
           '</div>' +
           '<div class="form-section">' +
@@ -268,8 +275,29 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
           '<p class="pay-note">'+LOCK+' Encrypted &nbsp;·&nbsp; Powered by Square</p>' +
         '</div>' +
       '</div>' +
-    '</div>' +
-    '';
+    '</div>';
+
+  renderTierInfo(initTier);
+
+  /* ── Tier tab switching ── */
+  document.getElementById('tierTabs').addEventListener('click', function(e){
+    var tab = e.target.closest('[data-switch]');
+    if(!tab) return;
+    var newTier = tab.getAttribute('data-switch');
+    if(newTier === selectedTier) return;
+    selectedTier = newTier;
+    document.querySelectorAll('.tier-tab').forEach(function(t){
+      t.classList.toggle('active', t.getAttribute('data-switch') === newTier);
+    });
+    renderTierInfo(newTier);
+    if(window._paymentRequest){
+      try {
+        window._paymentRequest.update({
+          total: { amount: DOLLAR_AMOUNTS[newTier], label: 'WinOnAny' },
+        });
+      } catch(x){ console.warn('[pay] paymentRequest.update failed:', x.message); }
+    }
+  });
 
   var btn = document.getElementById('checkoutBtn');
   var err = document.getElementById('errBanner');
@@ -283,14 +311,11 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     err.classList.remove('show');
   }
 
-  /* Dollar amounts must match lib/square.js PRODUCT_PRICES (/100) */
-  var DOLLAR_AMOUNTS = { access: '29.99', system: '59.99', control: '99.99' };
-
   async function submitCharge(sourceId){
     var charge = await fetch('/api/charge', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ sourceId: sourceId, tier: tier }),
+      body:    JSON.stringify({ sourceId: sourceId, tier: selectedTier }),
     }).then(function(r){ return r.json(); });
 
     if(charge.success){
@@ -345,37 +370,32 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
         return;
       }
 
-      /* ── Payment request (used for Apple Pay + Google Pay) ── */
+      /* ── Payment request (Apple Pay + Google Pay) ── */
       var paymentRequest = payments.paymentRequest({
         countryCode:  'US',
         currencyCode: 'USD',
         total: {
-          amount: DOLLAR_AMOUNTS[tier] || '29.99',
+          amount: DOLLAR_AMOUNTS[selectedTier],
           label:  'WinOnAny',
         },
       });
+      /* Expose so the tier switcher can call paymentRequest.update() */
+      window._paymentRequest = paymentRequest;
 
       var nativeShown = false;
 
       /* ── Google Pay ──
-         Square's googlePay().attach() injects a Google-rendered iframe.
-         We hide that iframe (height:0/overflow:hidden) and put our own
-         styled button on top — click on ours triggers tokenize() directly. ── */
+         Square renders the official Google Pay button inside #google-pay-button.
+         Listen on the Square object (not the DOM div) so the native button
+         click is correctly intercepted before Square fires its own handlers. ── */
       try {
         var googlePay = await payments.googlePay(paymentRequest);
-        // Square needs a DOM node to attach its hidden iframe into
-        var gpHiddenMount = document.createElement('div');
-        gpHiddenMount.style.cssText = 'position:absolute;height:0;overflow:hidden;pointer-events:none';
-        document.body.appendChild(gpHiddenMount);
-        await googlePay.attach(gpHiddenMount);
-
-        var gpBtn = document.getElementById('google-pay-button');
-        gpBtn.style.display = 'flex';
+        await googlePay.attach('#google-pay-button');
+        document.getElementById('google-pay-button').style.display = 'block';
         nativeShown = true;
 
-        gpBtn.addEventListener('click', async function(){
+        googlePay.addEventListener('click', async function(event){
           clearErr();
-          gpBtn.disabled = true;
           try {
             var result = await googlePay.tokenize();
             if(result.status !== 'OK'){
@@ -383,7 +403,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
             }
             await submitCharge(result.token);
           } catch(e){
-            gpBtn.disabled = false;
             showErr(e.message || 'Google Pay failed — try again.');
           }
         });
@@ -392,18 +411,20 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       }
 
       /* ── Apple Pay ──
-         payments.applePay() returns a tokenizer — no .attach() method exists.
-         Our styled <button#apple-pay-button> is already in the DOM; just show it. ── */
+         Requirements for the button to appear:
+         1. Safari on an Apple device with Apple Pay configured
+         2. HTTPS with a domain registered in Square dashboard → Online Checkout → Apple Pay
+            (register EVERY domain where this page loads — e.g. winonany.win AND winonany.com)
+         3. /.well-known/apple-developer-merchantid-domain-association served byte-exact
+         4. SQUARE_ENVIRONMENT must be 'production' — sandbox does NOT support Apple Pay ── */
       try {
         var applePay = await payments.applePay(paymentRequest);
-
-        var appleBtn = document.getElementById('apple-pay-button');
-        appleBtn.style.display = 'flex';
+        await applePay.attach('#apple-pay-button');
+        document.getElementById('apple-pay-button').style.display = 'block';
         nativeShown = true;
 
-        appleBtn.addEventListener('click', async function(){
+        applePay.addEventListener('click', async function(event){
           clearErr();
-          appleBtn.disabled = true;
           try {
             var result = await applePay.tokenize();
             if(result.status !== 'OK'){
@@ -411,21 +432,25 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
             }
             await submitCharge(result.token);
           } catch(e){
-            appleBtn.disabled = false;
             showErr(e.message || 'Apple Pay failed — try again.');
           }
         });
       } catch(e){
-        console.log('[pay] Apple Pay unavailable:', e && e.message ? e.message : String(e));
+        var apErr = e && e.message ? e.message : String(e);
+        console.warn('[pay] Apple Pay unavailable:', apErr);
+        if(apErr && apErr.toLowerCase().includes('safari')){
+          var hint = document.createElement('p');
+          hint.style.cssText = 'font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--muted-2);text-transform:uppercase;margin:0 0 14px;text-align:center';
+          hint.textContent = 'Open in Safari to use Apple Pay';
+          document.getElementById('native-pay-wrap').parentNode.insertBefore(hint, document.getElementById('native-pay-wrap'));
+        }
       }
 
       if(nativeShown){
         document.getElementById('native-pay-wrap').style.display = 'block';
       }
 
-      /* ── Card — Square-supported style properties only ──
-         Rules: no backgroundColor, no font-family fallbacks,
-         use .is-focus (not .is-focused) ── */
+      /* ── Card ── */
       var card = await payments.card({
         style: {
           '.input-container': {
@@ -484,7 +509,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
     } catch(e){
       var msg = e && e.message ? e.message : String(e);
-      /* Avoid "Checkout failed to initialize: Checkout failed to initialize…" */
       var display = msg.toLowerCase().startsWith('checkout failed')
         ? msg
         : 'Checkout failed to initialize — ' + msg;
