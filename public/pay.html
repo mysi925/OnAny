@@ -364,7 +364,13 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
         console.log('[pay] Google Pay unavailable:', e.message);
       }
 
-      /* ── Apple Pay ── */
+      /* ── Apple Pay ──
+         Requirements for the button to appear:
+         1. Safari on an Apple device with Apple Pay configured
+         2. HTTPS with a domain registered in Square dashboard → Online Checkout → Apple Pay
+            (register EVERY domain where this page loads — e.g. winonany.win AND winonany.com)
+         3. /.well-known/apple-developer-merchantid-domain-association served byte-exact
+         4. SQUARE_ENVIRONMENT must be 'production' — sandbox does NOT support Apple Pay ── */
       try {
         var applePay = await payments.applePay(paymentRequest);
         await applePay.attach('#apple-pay-button');
@@ -384,7 +390,11 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
           }
         });
       } catch(e){
-        console.log('[pay] Apple Pay unavailable:', e.message);
+        console.warn(
+          '[pay] Apple Pay unavailable on', window.location.hostname,
+          '| env:', cfg.environment,
+          '| reason:', e && e.message ? e.message : e
+        );
       }
 
       if(nativeShown){
