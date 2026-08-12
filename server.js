@@ -7,7 +7,6 @@ const path          = require('path');
 const fs            = require('fs');
 const cookieParser  = require('cookie-parser');
 const chargeRoute   = require('./api/charge');
-const checkoutRoute = require('./api/checkout');
 const webhookRoute  = require('./api/webhook');
 const authRoute     = require('./api/auth');
 const downloadRoute = require('./api/download');
@@ -55,7 +54,6 @@ app.get('/api/config', (req, res) => {
 
 // ── API routes ────────────────────────────────────────────────────────────────
 app.use('/api', chargeRoute);
-app.use('/api', checkoutRoute);
 app.use('/api', webhookRoute);
 app.use('/api', authRoute);
 app.use('/api', downloadRoute);
