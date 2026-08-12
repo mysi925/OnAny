@@ -4,140 +4,144 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Checkout — WinOnAny</title>
-<meta name="theme-color" content="#050507">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#F0F2F5">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://web.squarecdn.com/v1/square.js"></script>
 <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --void:#050507;--panel:#0B0B0F;--panel-2:#101016;
-  --line:rgba(255,255,255,.07);--line-2:rgba(255,255,255,.12);
-  --text:#F2F2F4;--muted:#85858F;--muted-2:#5C5C66;
-  --accent:#6E56F8;--accent-lift:#8B78FF;
-  --accent-soft:rgba(110,86,248,.14);--accent-line:rgba(110,86,248,.42);
-  --display:'Archivo','Helvetica Neue',Arial,sans-serif;
-  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-  --gutter:18px;--ease:cubic-bezier(.16,1,.3,1);
+  --bg:#EEF0F5;
+  --card:#FFFFFF;
+  --border:#E2E4EA;
+  --shadow:0 1px 4px rgba(0,0,0,.06), 0 4px 24px rgba(0,0,0,.07);
+  --text:#111118;
+  --muted:#6B7280;
+  --subtle:#9CA3AF;
+  --ac:#7C3AED;
+  --ac-hover:#6D28D9;
+  --ac-rgb:124,58,237;
+  --radius:10px;
+  --sans:'Inter','Helvetica Neue',Arial,sans-serif;
 }
-*,*::before,*::after{box-sizing:border-box;border-radius:0}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--void);color:var(--text);font-family:var(--display);font-weight:400;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
-a{color:inherit;text-decoration:none}
-button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-::selection{background:var(--accent);color:#fff}
-:focus-visible{outline:2px solid var(--accent-lift);outline-offset:3px}
+html,body{min-height:100%;-webkit-font-smoothing:antialiased}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--sans);
+  font-size:14px;line-height:1.6;font-weight:400;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:clamp(20px,4vw,40px) 16px;min-height:100vh;
+}
 
-.rails{position:fixed;inset:0;z-index:0;pointer-events:none}
-.rails-inner{height:100%;max-width:1200px;margin:0 auto;padding:0 18px;display:grid;grid-template-columns:repeat(2,1fr)}
-.rails-inner span{border-left:1px solid rgba(255,255,255,.03)}
-.rails-inner span:first-child{border-left:0}
-@media(min-width:760px){.rails-inner{grid-template-columns:repeat(4,1fr)}}
+/* ── checkout card ── */
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  width:100%;max-width:400px;overflow:hidden;
+  animation:up .3s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-.bg-glow{position:fixed;left:50%;top:-30%;width:min(900px,130vw);aspect-ratio:1/.65;transform:translateX(-50%);pointer-events:none;z-index:0;background:radial-gradient(ellipse at center,rgba(110,86,248,.18),rgba(110,86,248,.05) 44%,transparent 70%);filter:blur(10px);}
-.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:64px 64px;-webkit-mask-image:radial-gradient(ellipse 78% 54% at 50% 22%,#000 20%,transparent 74%);mask-image:radial-gradient(ellipse 78% 54% at 50% 22%,#000 20%,transparent 74%);}
+/* ── card header ── */
+.card-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 24px 18px;border-bottom:1px solid var(--border);
+}
+.brand{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;letter-spacing:-.02em;color:var(--text);text-decoration:none}
+.brand-dot{width:6px;height:6px;border-radius:50%;background:var(--ac);flex-shrink:0}
+.secure{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--subtle);font-weight:500}
+.secure svg{width:11px;height:11px;flex-shrink:0}
 
-.topbar{position:sticky;top:0;z-index:60;background:rgba(5,5,7,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-.topbar-inner{max-width:1200px;margin:0 auto;padding:0 var(--gutter);display:flex;align-items:center;justify-content:space-between;min-height:62px;gap:12px;position:relative;z-index:2}
-.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.04em}
-.brand .dot{width:7px;height:7px;background:var(--accent);box-shadow:0 0 14px 2px rgba(110,86,248,.8);flex-shrink:0}
-.secure-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2);display:flex;align-items:center;gap:7px}
-.secure-tag svg{width:11px;height:11px;color:var(--accent-lift)}
+/* ── product summary ── */
+.summary{padding:20px 24px 0}
+.prod-label{font-size:13px;color:var(--muted);font-weight:500;margin-bottom:4px}
+.prod-price{font-size:36px;font-weight:700;letter-spacing:-.04em;line-height:1;color:var(--text);display:flex;align-items:baseline;gap:5px}
+.prod-price .curr{font-size:14px;font-weight:500;color:var(--muted);letter-spacing:0}
+.prod-note{font-size:12.5px;color:var(--subtle);margin-top:6px}
 
-.page{position:relative;z-index:2;min-height:calc(100vh - 62px);display:flex;align-items:flex-start;justify-content:center;padding:clamp(36px,6vw,72px) var(--gutter) 60px}
+/* ── divider ── */
+.div{height:1px;background:var(--border);margin:20px 0}
 
-/* ── two-column layout on wide screens ── */
-.checkout-grid{width:100%;max-width:900px;display:grid;grid-template-columns:1fr;gap:clamp(16px,3vw,28px)}
-@media(min-width:760px){.checkout-grid{grid-template-columns:1fr 1fr;align-items:start}}
+/* ── payment section ── */
+.pay-section{padding:0 24px 24px}
+.pay-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--subtle);margin-bottom:10px}
 
-/* ── shared card shell ── */
-.card{background:var(--panel);border:1px solid var(--line-2);position:relative;overflow:hidden}
-.card::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent 0%,var(--accent) 40%,var(--accent-lift) 60%,transparent 100%)}
-.card-inner{padding:clamp(24px,4vw,36px) clamp(20px,3.5vw,32px)}
-
-/* ── tier summary (left card) ── */
-.tier-badge{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-lift);margin-bottom:14px;display:block}
-.tier-price{font-size:clamp(38px,8vw,56px);font-weight:800;letter-spacing:-.06em;line-height:1}
-.tier-price .cents{font-size:clamp(20px,4vw,28px);font-weight:600;opacity:.7}
-.tier-name{font-size:clamp(16px,2.4vw,19px);font-weight:700;letter-spacing:-.03em;margin-top:10px}
-.tier-sum{color:var(--muted);font-size:13.5px;line-height:1.55;margin-top:7px}
-.div{height:1px;background:var(--line);margin:20px 0}
-.features{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
-.features li{display:flex;align-items:flex-start;gap:11px;font-size:13.5px;color:#CFCFD6;line-height:1.4}
-.features li .chk{width:15px;height:15px;flex-shrink:0;background:var(--accent-soft);border:1px solid var(--accent-line);display:flex;align-items:center;justify-content:center;margin-top:2px}
-.features li .chk svg{width:8px;height:8px;color:var(--accent-lift)}
-.trust{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2)}
-.trust svg{width:11px;height:11px;flex-shrink:0;color:var(--accent-lift)}
-
-/* ── payment form (right card) ── */
-.form-label{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted-2);display:block;margin-bottom:8px}
-.form-section{margin-bottom:20px}
-
-/* Square card element container */
+/* Square card container — let Square's iframe sit cleanly */
 #card-container{
-  background:var(--panel-2);
-  border:1px solid var(--line-2);
-  padding:14px 14px 6px;
-  transition:border-color .3s;
-  min-height:40px;
+  border:1px solid var(--border);border-radius:8px;
+  padding:4px 2px;background:#fff;
+  transition:border-color .2s,box-shadow .2s;
+  min-height:44px;
 }
-#card-container.sq-focused{border-color:var(--accent)}
-#card-container.sq-error{border-color:#ef4444}
-
-/* Square injects an iframe — give it room */
+#card-container.sq-focused{
+  border-color:var(--ac);
+  box-shadow:0 0 0 3px rgba(var(--ac-rgb),.12);
+}
+#card-container.sq-error{
+  border-color:#EF4444;
+  box-shadow:0 0 0 3px rgba(239,68,68,.10);
+}
 #card-container iframe{display:block;width:100%}
 
+/* ── pay button ── */
 .btn-pay{
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  width:100%;min-height:58px;background:var(--accent);color:#fff;
-  font-size:16px;font-weight:700;letter-spacing:.01em;border:0;
-  position:relative;overflow:hidden;
-  transition:.4s var(--ease);
-  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
-  margin-top:4px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;min-height:46px;margin-top:14px;
+  background:var(--ac);color:#fff;border:0;border-radius:8px;
+  font-family:var(--sans);font-size:15px;font-weight:600;letter-spacing:-.01em;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:background .2s,transform .15s,box-shadow .2s;
+  -webkit-tap-highlight-color:transparent;
 }
-.btn-pay::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);transform:translateX(-110%);transition:transform .7s var(--ease)}
-.btn-pay:not(:disabled):hover{background:var(--accent-lift);box-shadow:0 18px 52px -18px rgba(110,86,248,.9)}
-.btn-pay:not(:disabled):hover::after{transform:translateX(110%)}
+.btn-pay:not(:disabled):hover{background:var(--ac-hover);box-shadow:0 4px 18px -6px rgba(var(--ac-rgb),.55)}
 .btn-pay:not(:disabled):active{transform:scale(.98)}
 .btn-pay:disabled{opacity:.55;cursor:not-allowed}
-.btn-pay .spin{width:18px;height:18px;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;animation:spin .7s linear infinite;flex-shrink:0;display:none}
+.btn-pay .spin{
+  width:16px;height:16px;flex-shrink:0;display:none;
+  border:2px solid rgba(255,255,255,.3);border-top-color:#fff;
+  border-radius:50%;animation:spin .65s linear infinite;
+}
 @keyframes spin{to{transform:rotate(360deg)}}
 .btn-pay.loading .spin{display:block}
-.btn-pay.loading .btn-label,.btn-pay.loading .arw{display:none}
+.btn-pay.loading .btn-label{display:none}
 
-.err{display:none;background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.28);padding:10px 13px;font-size:13px;color:#F87171;line-height:1.5;margin-top:14px}
+/* ── error ── */
+.err{
+  display:none;margin-top:12px;padding:10px 13px;
+  background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;
+  font-size:13px;color:#B91C1C;line-height:1.5;
+}
 .err.show{display:block}
 
-.pay-note{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-2);text-align:center;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:7px}
-#google-pay-button,#apple-pay-button{display:none;width:100%;min-height:48px;margin-bottom:10px}
-.pay-divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--muted-2);font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
-.pay-divider::before,.pay-divider::after{content:"";flex:1;height:1px;background:var(--line)}
-.pay-note svg{width:10px;height:10px;flex-shrink:0}
+/* ── footer ── */
+.card-foot{
+  padding:14px 24px;border-top:1px solid var(--border);
+  text-align:center;font-size:12px;color:var(--subtle);
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.card-foot svg{width:10px;height:10px;flex-shrink:0}
+.sq-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  color:var(--ac);font-weight:500;font-size:12px;
+}
 
-.back-link{display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2);margin-top:clamp(16px,3vw,24px);transition:color .25s}
-.back-link:hover{color:var(--muted)}
+/* ── not found state ── */
+.not-found{text-align:center;max-width:340px}
+.not-found h1{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px;color:var(--text)}
+.not-found p{color:var(--muted);font-size:14px;margin-bottom:20px}
+.not-found a{
+  display:inline-flex;align-items:center;gap:6px;padding:10px 20px;
+  background:var(--ac);color:#fff;border-radius:7px;
+  font-size:14px;font-weight:600;text-decoration:none;
+  transition:background .2s;
+}
+.not-found a:hover{background:var(--ac-hover)}
 
-/* ── skeleton loader ── */
-.sk{background:linear-gradient(90deg,var(--panel) 25%,var(--panel-2) 50%,var(--panel) 75%);background-size:400% 100%;animation:sk 1.4s ease infinite;height:14px;margin:8px 0}
-@keyframes sk{0%{background-position:100% 0}100%{background-position:-100% 0}}
-
-/* ── not-found ── */
-.not-found{text-align:center;padding:clamp(60px,10vw,100px) 20px}
-.not-found h1{font-size:clamp(28px,5vw,42px);font-weight:800;letter-spacing:-.04em;margin-bottom:12px}
-.not-found p{color:var(--muted);font-size:15px;margin-bottom:28px}
-.not-found a{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 24px;border:1px solid var(--line-2);font-weight:600;font-size:14px;transition:.3s var(--ease)}
-.not-found a:hover{border-color:rgba(255,255,255,.32)}
-
-.footer{border-top:1px solid var(--line);padding:22px var(--gutter);position:relative;z-index:2}
-.footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
-.footer p,.footer a{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--muted-2);text-transform:uppercase}
-.footer a{transition:color .25s}
-.footer a:hover{color:var(--muted)}
-
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.checkout-grid{animation:fadeUp .55s var(--ease) both}
-
+@media(max-width:440px){
+  .card-head,.summary,.pay-section,.card-foot{padding-left:18px;padding-right:18px}
+  .prod-price{font-size:30px}
+}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
 }
@@ -145,30 +149,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 </head>
 <body>
 
-<div class="rails" aria-hidden="true"><div class="rails-inner"><span></span><span></span><span></span><span></span></div></div>
-<div class="bg-glow" aria-hidden="true"></div>
-<div class="bg-mesh" aria-hidden="true"></div>
-
-<header class="topbar">
-  <div class="topbar-inner">
-    <span class="brand" aria-label="WinOnAny"><i class="dot" aria-hidden="true"></i>WinOnAny</span>
-    <p class="secure-tag">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Secure checkout
-    </p>
-  </div>
-</header>
-
-<div class="page">
-  <div id="root" style="width:100%;max-width:900px"></div>
-</div>
-
-<footer class="footer">
-  <div class="footer-inner">
-    <p>18+ only &nbsp;·&nbsp; One payment &nbsp;·&nbsp; No subscription</p>
-    <p>18+ only &nbsp;·&nbsp; One payment &nbsp;·&nbsp; No subscription</p>
-  </div>
-</footer>
+<div id="root"></div>
 
 <script>
 (function(){
@@ -176,235 +157,126 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
   var TIERS = {
     access: {
-      badge:'Starter', name:'Starter Access',
-      dollars:'29', cents:'99',
-      summary:'The entry point. Scripts and openers that actually get responses.',
-      features:['First message scripts','Profile optimization guide','Flirting frameworks'],
+      label: 'Starter',
+      dollars: '29', cents: '99',
+      note: 'One-time payment · Instant access',
     },
     system: {
-      badge:'Most Popular', name:'The Vault',
-      dollars:'59', cents:'99',
-      summary:'Full access. Every guide, every platform. Everything you need to start getting wins.',
-      features:['Everything in Starter','Platform-specific playbooks (Snap, IG, Tinder, Hinge, X)','Escalation strategies','Conversation breakdowns','Reply psychology guide'],
+      label: 'The Vault',
+      dollars: '59', cents: '99',
+      note: 'One-time payment · Instant access',
     },
     control: {
-      badge:'Full Access', name:'Full Access',
-      dollars:'99', cents:'99',
-      summary:'Everything in the vault plus every new drop. Covered for good.',
-      features:['Everything in The Vault','Advanced platform methods','Real screenshot breakdowns','All future content included'],
+      label: 'Full Access',
+      dollars: '99', cents: '99',
+      note: 'One-time payment · Instant access',
     },
   };
 
-  var params  = new URLSearchParams(window.location.search);
-  var tier    = params.get('tier') || '';
-  var data    = TIERS[tier];
-  var root    = document.getElementById('root');
+  var params = new URLSearchParams(window.location.search);
+  var tier   = params.get('tier') || '';
+  var data   = TIERS[tier];
+  var root   = document.getElementById('root');
 
-  /* ── no valid tier — send back to pricing ── */
+  var LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+
   if(!data){
-    window.location.replace('https://winonany.com/#pricing');
+    root.innerHTML =
+      '<div class="card"><div style="padding:32px 24px"><div class="not-found">' +
+        '<h1>Invalid link.</h1>' +
+        '<p>That checkout link doesn\'t match any plan. Please go back and select a tier.</p>' +
+        '<a href="https://winonany.com/#pricing">← See pricing</a>' +
+      '</div></div></div>';
     return;
   }
 
-  var CHK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-  var LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
-
-  var feats = data.features.map(function(f){
-    return '<li><span class="chk">'+CHK+'</span>'+f+'</li>';
-  }).join('');
+  var priceStr = '$' + data.dollars + '.' + data.cents;
 
   root.innerHTML =
-    '<div class="checkout-grid">' +
-      /* ── left: tier summary ── */
-      '<div class="card" id="summaryCard">' +
-        '<div class="card-inner">' +
-          '<span class="tier-badge">'+data.badge+'</span>' +
-          '<div class="tier-price">$'+data.dollars+'<span class="cents">.'+data.cents+'</span></div>' +
-          '<p class="tier-name">'+data.name+'</p>' +
-          '<p class="tier-sum">'+data.summary+'</p>' +
-          '<div class="div"></div>' +
-          '<ul class="features">'+feats+'</ul>' +
-          '<div class="div"></div>' +
-          '<p class="trust">'+LOCK+'One payment. No subscription. Instant access.</p>' +
-        '</div>' +
+    '<div class="card">' +
+
+      /* header */
+      '<div class="card-head">' +
+        '<a class="brand" href="https://winonany.com" aria-label="WinOnAny">' +
+          '<span class="brand-dot" aria-hidden="true"></span>WinOnAny' +
+        '</a>' +
+        '<span class="secure">' + LOCK + 'Secure</span>' +
       '</div>' +
-      /* ── right: payment form ── */
-      '<div class="card" id="payCard">' +
-        '<div class="card-inner">' +
-          /* Native pay buttons — hidden until Square confirms availability */
-          '<div id="native-pay-wrap" style="display:none">' +
-            '<div id="google-pay-button"></div>' +
-            '<div id="apple-pay-button"></div>' +
-            '<div class="pay-divider"><span>or pay with card</span></div>' +
-          '</div>' +
-          '<div class="form-section">' +
-            '<label class="form-label" for="card-container">Card details</label>' +
-            '<div id="card-container"></div>' +
-          '</div>' +
-          '<button class="btn-pay" id="checkoutBtn" type="button" disabled>' +
-            '<i class="spin" aria-hidden="true"></i>' +
-            '<span class="btn-label">Complete Purchase</span>' +
-            '<span class="arw" aria-hidden="true"> →</span>' +
-          '</button>' +
-          '<div class="err" id="errBanner" role="alert" aria-live="polite"></div>' +
-          '<p class="pay-note">'+LOCK+' Encrypted &nbsp;·&nbsp; Powered by Square</p>' +
-        '</div>' +
+
+      /* product summary */
+      '<div class="summary">' +
+        '<p class="prod-label">' + data.label + '</p>' +
+        '<div class="prod-price">$' + data.dollars + '<span class="curr">.' + data.cents + ' USD</span></div>' +
+        '<p class="prod-note">' + data.note + '</p>' +
       '</div>' +
-    '</div>' +
-    '';
 
-  var btn = document.getElementById('checkoutBtn');
-  var err = document.getElementById('errBanner');
+      /* divider */
+      '<div style="padding:0 24px"><div class="div"></div></div>' +
 
-  function showErr(msg){
-    err.textContent = msg;
-    err.classList.add('show');
-  }
-  function clearErr(){
-    err.textContent = '';
-    err.classList.remove('show');
-  }
+      /* payment */
+      '<div class="pay-section">' +
+        '<p class="pay-label">Card details</p>' +
+        '<div id="card-container"></div>' +
+        '<button class="btn-pay" id="payBtn" type="button" disabled>' +
+          '<i class="spin" aria-hidden="true"></i>' +
+          '<span class="btn-label">Pay ' + priceStr + '</span>' +
+        '</button>' +
+        '<div class="err" id="errBox" role="alert" aria-live="polite"></div>' +
+      '</div>' +
 
-  /* Dollar amounts must match lib/square.js PRODUCT_PRICES (/100) */
-  var DOLLAR_AMOUNTS = { access: '29.99', system: '59.99', control: '99.99' };
+      /* footer */
+      '<div class="card-foot">' +
+        LOCK +
+        'Encrypted &nbsp;·&nbsp; Powered by <span class="sq-badge">Square</span>' +
+      '</div>' +
 
-  async function submitCharge(sourceId){
-    var charge = await fetch('/api/charge', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ sourceId: sourceId, tier: tier }),
-    }).then(function(r){ return r.json(); });
+    '</div>';
 
-    if(charge.success){
-      window.location.href = charge.redirectUrl;
-    } else {
-      throw new Error(charge.error || 'Payment failed — try again.');
-    }
-  }
+  var btn = document.getElementById('payBtn');
+  var err = document.getElementById('errBox');
 
-  /* ── init Square Web Payments SDK ── */
+  function showErr(msg){ err.textContent = msg; err.classList.add('show'); }
+  function clearErr(){ err.textContent = ''; err.classList.remove('show'); }
+
+  /* Square Web Payments SDK init */
   (async function init(){
     try {
-      var cfgRes = await fetch('/api/config');
-      var cfg    = await cfgRes.json();
+      var cfg = await fetch('/api/config').then(function(r){ return r.json(); });
+      if(!window.Square){ showErr('Payment system failed to load — refresh and try again.'); return; }
 
-      if(!window.Square){
-        showErr('Payment system script failed to load. Check your connection and refresh.');
-        return;
-      }
+      var payments = Square.payments(cfg.squareAppId, cfg.squareLocationId);
 
-      if(!cfg.squareAppId || !cfg.squareLocationId){
-        showErr(
-          'Checkout config missing — contact support. ' +
-          '(appId: ' + (cfg.squareAppId  ? 'OK' : 'MISSING') + ', ' +
-          'locationId: ' + (cfg.squareLocationId ? 'OK' : 'MISSING') + ')'
-        );
-        console.error('[pay] /api/config returned:', cfg);
-        return;
-      }
-
-      var payments;
-      try {
-        payments = Square.payments(cfg.squareAppId, cfg.squareLocationId);
-      } catch(sqErr){
-        showErr('Square init failed: ' + (sqErr.message || sqErr));
-        console.error('[pay] Square.payments() threw:', sqErr);
-        return;
-      }
-
-      /* ── Payment request (used for Apple Pay + Google Pay) ── */
-      var paymentRequest = payments.paymentRequest({
-        countryCode:  'US',
-        currencyCode: 'USD',
-        total: {
-          amount: DOLLAR_AMOUNTS[tier] || '29.99',
-          label:  'WinOnAny',
-        },
-      });
-
-      var nativeShown = false;
-
-      /* ── Google Pay ── */
-      try {
-        var googlePay = await payments.googlePay(paymentRequest);
-        await googlePay.attach('#google-pay-button');
-        document.getElementById('google-pay-button').style.display = 'block';
-        nativeShown = true;
-
-        document.getElementById('google-pay-button').addEventListener('click', async function(){
-          clearErr();
-          try {
-            var result = await googlePay.tokenize();
-            if(result.status !== 'OK'){
-              throw new Error((result.errors && result.errors[0]) ? result.errors[0].message : 'Google Pay failed.');
-            }
-            await submitCharge(result.token);
-          } catch(e){
-            showErr(e.message || 'Google Pay failed — try again.');
-          }
-        });
-      } catch(e){
-        console.log('[pay] Google Pay unavailable:', e.message);
-      }
-
-      /* ── Apple Pay ── */
-      try {
-        var applePay = await payments.applePay(paymentRequest);
-        await applePay.attach('#apple-pay-button');
-        document.getElementById('apple-pay-button').style.display = 'block';
-        nativeShown = true;
-
-        document.getElementById('apple-pay-button').addEventListener('click', async function(){
-          clearErr();
-          try {
-            var result = await applePay.tokenize();
-            if(result.status !== 'OK'){
-              throw new Error((result.errors && result.errors[0]) ? result.errors[0].message : 'Apple Pay failed.');
-            }
-            await submitCharge(result.token);
-          } catch(e){
-            showErr(e.message || 'Apple Pay failed — try again.');
-          }
-        });
-      } catch(e){
-        console.log('[pay] Apple Pay unavailable:', e.message);
-      }
-
-      if(nativeShown){
-        document.getElementById('native-pay-wrap').style.display = 'block';
-      }
-
-      /* ── Card — Square-supported style properties only ──
-         Rules: no backgroundColor, no font-family fallbacks,
-         use .is-focus (not .is-focused) ── */
+      /* Style Square's fields to match the light card */
       var card = await payments.card({
         style: {
           '.input-container': {
-            borderColor:  'rgba(255,255,255,.12)',
-            borderRadius: '0px',
+            borderColor: '#E2E4EA',
+            borderRadius: '6px',
+            backgroundColor: '#FFFFFF',
           },
-          '.input-container.is-focus': {
-            borderColor: '#6E56F8',
+          '.input-container.is-focused': {
+            borderColor: '#7C3AED',
           },
           '.input-container.is-error': {
-            borderColor: '#ef4444',
+            borderColor: '#EF4444',
           },
           'input': {
-            color:      '#050507',
+            color: '#111118',
+            fontFamily: '"Inter","Helvetica Neue",Arial,sans-serif',
+            fontSize: '14px',
             fontWeight: '400',
           },
           'input::placeholder': {
-            color: '#999999',
+            color: '#9CA3AF',
           },
           '.message-text': {
-            color: '#555555',
+            color: '#6B7280',
+            fontFamily: '"Inter","Helvetica Neue",Arial,sans-serif',
+            fontSize: '12px',
           },
-          '.message-text.is-error': {
-            color: '#F87171',
-          },
-          '.message-icon.is-error': {
-            color: '#F87171',
-          },
+          '.message-text.is-error': { color: '#B91C1C' },
+          '.message-icon': { color: '#9CA3AF' },
+          '.message-icon.is-error': { color: '#B91C1C' },
         },
       });
 
@@ -418,13 +290,22 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
         try {
           var result = await card.tokenize();
-
           if(result.status !== 'OK'){
             var msg = (result.errors && result.errors[0]) ? result.errors[0].message : 'Card error — check your details.';
             throw new Error(msg);
           }
 
-          await submitCharge(result.token);
+          var charge = await fetch('/api/charge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sourceId: result.token, tier: tier }),
+          }).then(function(r){ return r.json(); });
+
+          if(charge.success){
+            window.location.href = charge.redirectUrl || ('https://winonany.com/success?tier=' + tier);
+          } else {
+            throw new Error(charge.error || 'Payment failed — try again.');
+          }
 
         } catch(e){
           btn.disabled = false;
@@ -434,8 +315,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       });
 
     } catch(e){
-      var msg = e && e.message ? e.message : String(e);
-      showErr('Checkout failed to initialize: ' + msg);
+      showErr('Checkout failed to initialize. Refresh and try again.');
       console.error('[pay] init error:', e);
     }
   })();
