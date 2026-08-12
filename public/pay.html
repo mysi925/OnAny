@@ -390,11 +390,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
           }
         });
       } catch(e){
-        console.warn(
-          '[pay] Apple Pay unavailable on', window.location.hostname,
-          '| env:', cfg.environment,
-          '| reason:', e && e.message ? e.message : e
-        );
+        var apErr = e && e.message ? e.message : String(e);
+        console.warn('[pay] Apple Pay unavailable on', window.location.hostname, '| env:', cfg.environment, '| reason:', apErr);
+        /* DEBUG — remove after confirming Apple Pay works */
+        showErr('[Apple Pay debug] ' + apErr + ' (host: ' + window.location.hostname + ', env: ' + cfg.environment + ')');
       }
 
       if(nativeShown){
