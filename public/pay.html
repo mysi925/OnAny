@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://apple-pay-statics.cdn-apple.com/applepayweb/v1/button.css">
 <!-- Square SDK loaded dynamically after /api/config so the correct
      sandbox vs production URL is used — mismatching them causes
      "Checkout failed to initialize" on Square.payments() call. -->
@@ -112,7 +113,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .err.show{display:block}
 
 .pay-note{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-2);text-align:center;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:7px}
-#google-pay-button,#apple-pay-button{display:none;width:100%;min-height:48px;margin-bottom:10px}
+#google-pay-button{display:none;width:100%;min-height:48px;margin-bottom:10px}
+#apple-pay-button{display:none;width:100%;height:48px;margin-bottom:10px}
+#apple-pay-button apple-pay-button{--apple-pay-button-width:100%;--apple-pay-button-height:48px;--apple-pay-button-border-radius:0;--apple-pay-button-padding:0}
 .pay-divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--muted-2);font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
 .pay-divider::before,.pay-divider::after{content:"";flex:1;height:1px;background:var(--line)}
 .pay-note svg{width:10px;height:10px;flex-shrink:0}
@@ -365,19 +368,24 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       }
 
       /* ── Apple Pay ──
-         Requirements for the button to appear:
-         1. Safari on an Apple device with Apple Pay configured
-         2. HTTPS with a domain registered in Square dashboard → Online Checkout → Apple Pay
-            (register EVERY domain where this page loads — e.g. winonany.win AND winonany.com)
+         Square's applePay() does NOT have an .attach() method.
+         It returns a tokenizer — build the button yourself via the
+         <apple-pay-button> custom element and call applePay.tokenize() on click.
+         Requirements:
+         1. Safari on Apple device with a card configured in Wallet
+         2. HTTPS + domain registered in Square Dashboard → Online Checkout → Apple Pay
+            (register winonany.win AND winonany.com separately)
          3. /.well-known/apple-developer-merchantid-domain-association served byte-exact
-         4. SQUARE_ENVIRONMENT must be 'production' — sandbox does NOT support Apple Pay ── */
+         4. SQUARE_ENVIRONMENT = 'production' — sandbox blocks Apple Pay entirely ── */
       try {
         var applePay = await payments.applePay(paymentRequest);
-        await applePay.attach('#apple-pay-button');
-        document.getElementById('apple-pay-button').style.display = 'block';
+
+        var appleBtn = document.getElementById('apple-pay-button');
+        appleBtn.innerHTML = '<apple-pay-button buttonstyle="black" type="buy" locale="en-US"></apple-pay-button>';
+        appleBtn.style.display = 'block';
         nativeShown = true;
 
-        document.getElementById('apple-pay-button').addEventListener('click', async function(){
+        appleBtn.addEventListener('click', async function(){
           clearErr();
           try {
             var result = await applePay.tokenize();
@@ -390,10 +398,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
           }
         });
       } catch(e){
-        var apErr = e && e.message ? e.message : String(e);
-        console.warn('[pay] Apple Pay unavailable on', window.location.hostname, '| env:', cfg.environment, '| reason:', apErr);
-        /* DEBUG — remove after confirming Apple Pay works */
-        showErr('[Apple Pay debug] ' + apErr + ' (host: ' + window.location.hostname + ', env: ' + cfg.environment + ')');
+        console.log('[pay] Apple Pay unavailable:', e && e.message ? e.message : String(e));
       }
 
       if(nativeShown){
