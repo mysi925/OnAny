@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://apple-pay-statics.cdn-apple.com/applepayweb/v1/button.css">
+
 <!-- Square SDK loaded dynamically after /api/config so the correct
      sandbox vs production URL is used — mismatching them causes
      "Checkout failed to initialize" on Square.payments() call. -->
@@ -113,9 +113,17 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .err.show{display:block}
 
 .pay-note{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-2);text-align:center;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:7px}
-#google-pay-button{display:none;width:100%;min-height:48px;margin-bottom:10px}
-#apple-pay-button{display:none;width:100%;height:48px;margin-bottom:10px}
-#apple-pay-button apple-pay-button{--apple-pay-button-width:100%;--apple-pay-button-height:48px;--apple-pay-button-border-radius:0;--apple-pay-button-padding:0}
+.native-pay-btn{
+  display:none;width:100%;height:52px;margin-bottom:10px;
+  align-items:center;justify-content:center;gap:10px;
+  border:0;cursor:pointer;font-size:15px;font-weight:600;
+  font-family:var(--display);letter-spacing:.01em;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+}
+#google-pay-button{background:#fff;color:#000;}
+#google-pay-button svg{flex-shrink:0}
+#apple-pay-button{background:#000;color:#fff;}
+#apple-pay-button svg{flex-shrink:0}
 .pay-divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--muted-2);font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
 .pay-divider::before,.pay-divider::after{content:"";flex:1;height:1px;background:var(--line)}
 .pay-note svg{width:10px;height:10px;flex-shrink:0}
@@ -238,8 +246,14 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
         '<div class="card-inner">' +
           /* Native pay buttons — hidden until Square confirms availability */
           '<div id="native-pay-wrap" style="display:none">' +
-            '<div id="google-pay-button"></div>' +
-            '<div id="apple-pay-button"></div>' +
+            '<button class="native-pay-btn" id="google-pay-button" type="button" aria-label="Pay with Google Pay" style="display:none">' +
+              '<svg height="22" viewBox="0 0 41 17" xmlns="http://www.w3.org/2000/svg"><path d="M19.526 2.635v4.083h2.518c.6 0 1.096-.202 1.488-.605.403-.403.605-.882.605-1.437 0-.544-.202-1.018-.605-1.422-.392-.413-.888-.62-1.488-.62h-2.518zm0 5.52v4.736h-1.504V1.198h3.99c1.013 0 1.873.337 2.582 1.012.72.675 1.08 1.497 1.08 2.466 0 .991-.36 1.819-1.08 2.482-.697.665-1.559.996-2.583.996h-2.485zm7.668 2.287c0 .56.187 1.032.56 1.403.375.368.836.554 1.38.554.75 0 1.34-.285 1.765-.854l1.188.844c-.64.902-1.59 1.354-2.846 1.354-1.058 0-1.935-.334-2.628-1.003-.693-.668-1.04-1.535-1.04-2.6 0-1.047.342-1.91 1.025-2.588.685-.679 1.537-1.018 2.556-1.018.983 0 1.805.355 2.466 1.066.66.712.99 1.587.99 2.628l-.016.214h-5.4zm3.817-1.298c-.056-.55-.277-.985-.66-1.3-.382-.317-.84-.475-1.372-.475-.542 0-1.003.158-1.38.475-.377.317-.61.752-.697 1.3h4.11zm3.56-4.16l1.785 4.717 1.786-4.718h1.638L36.7 13.892h-1.572l-1.07-2.967-2.154-5.942h1.668zm-24.553 2.96c0-.56-.046-1.096-.134-1.607h-7.18v3.041h4.108c-.176.952-.713 1.76-1.52 2.302v1.913h2.46c1.44-1.327 2.27-3.279 2.27-5.648z" fill="#4285F4"/><path d="M9.684 14.6c2.063 0 3.796-.683 5.063-1.855l-2.46-1.912c-.682.457-1.555.728-2.603.728-2.003 0-3.7-1.353-4.307-3.172H2.87v1.974C4.127 12.82 6.724 14.6 9.684 14.6z" fill="#34A853"/><path d="M5.377 8.39c-.154-.457-.24-.944-.24-1.447s.086-.99.24-1.447V3.522H2.87C2.31 4.636 2 5.89 2 7.22c0 1.33.31 2.584.87 3.7l2.507-1.53z" fill="#FBBC04"/><path d="M9.684 3.627c1.128 0 2.14.388 2.937 1.15l2.2-2.2C13.47.926 11.737.2 9.684.2 6.724.2 4.127 1.98 2.87 4.51l2.507 1.53c.607-1.82 2.304-3.172 4.307-3.172z" fill="#EA4335"/></svg>' +
+              ' Google Pay' +
+            '</button>' +
+            '<button class="native-pay-btn" id="apple-pay-button" type="button" aria-label="Pay with Apple Pay" style="display:none">' +
+              '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="22" viewBox="0 0 814 1000" fill="#fff"><path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-42.4-150.3-109.2c-52.1-79.4-98.2-207.3-98.2-329.2 0-170.1 111.4-260 221-260 75.5 0 138.1 49.1 185.1 49.1 44.6 0 115.2-52.6 199.2-52.6zm-200.1-175.4c37.5-44.8 64.1-107.2 64.1-169.5 0-8.9-.6-17.9-2.2-25.5-60.5 2.3-132.4 40.2-175.9 91.4-34 37.9-66.5 101.4-66.5 164.6 0 9.5 1.7 19 2.3 22.2 4 .6 10.6 1.7 17.2 1.7 54.1 0 122.5-36.5 161-84.9z"/></svg>' +
+              ' Apple Pay' +
+            '</button>' +
             '<div class="pay-divider"><span>or pay with card</span></div>' +
           '</div>' +
           '<div class="form-section">' +
@@ -344,15 +358,25 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
       var nativeShown = false;
 
-      /* ── Google Pay ── */
+      /* ── Google Pay ──
+         Square's googlePay().attach() injects a Google-rendered iframe.
+         We hide that iframe (height:0/overflow:hidden) and put our own
+         styled button on top — click on ours triggers tokenize() directly. ── */
       try {
         var googlePay = await payments.googlePay(paymentRequest);
-        await googlePay.attach('#google-pay-button');
-        document.getElementById('google-pay-button').style.display = 'block';
+        // Square needs a DOM node to attach its hidden iframe into
+        var gpHiddenMount = document.createElement('div');
+        gpHiddenMount.style.cssText = 'position:absolute;height:0;overflow:hidden;pointer-events:none';
+        document.body.appendChild(gpHiddenMount);
+        await googlePay.attach(gpHiddenMount);
+
+        var gpBtn = document.getElementById('google-pay-button');
+        gpBtn.style.display = 'flex';
         nativeShown = true;
 
-        document.getElementById('google-pay-button').addEventListener('click', async function(){
+        gpBtn.addEventListener('click', async function(){
           clearErr();
+          gpBtn.disabled = true;
           try {
             var result = await googlePay.tokenize();
             if(result.status !== 'OK'){
@@ -360,6 +384,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
             }
             await submitCharge(result.token);
           } catch(e){
+            gpBtn.disabled = false;
             showErr(e.message || 'Google Pay failed — try again.');
           }
         });
@@ -368,25 +393,18 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       }
 
       /* ── Apple Pay ──
-         Square's applePay() does NOT have an .attach() method.
-         It returns a tokenizer — build the button yourself via the
-         <apple-pay-button> custom element and call applePay.tokenize() on click.
-         Requirements:
-         1. Safari on Apple device with a card configured in Wallet
-         2. HTTPS + domain registered in Square Dashboard → Online Checkout → Apple Pay
-            (register winonany.win AND winonany.com separately)
-         3. /.well-known/apple-developer-merchantid-domain-association served byte-exact
-         4. SQUARE_ENVIRONMENT = 'production' — sandbox blocks Apple Pay entirely ── */
+         payments.applePay() returns a tokenizer — no .attach() method exists.
+         Our styled <button#apple-pay-button> is already in the DOM; just show it. ── */
       try {
         var applePay = await payments.applePay(paymentRequest);
 
         var appleBtn = document.getElementById('apple-pay-button');
-        appleBtn.innerHTML = '<apple-pay-button buttonstyle="black" type="buy" locale="en-US"></apple-pay-button>';
-        appleBtn.style.display = 'block';
+        appleBtn.style.display = 'flex';
         nativeShown = true;
 
         appleBtn.addEventListener('click', async function(){
           clearErr();
+          appleBtn.disabled = true;
           try {
             var result = await applePay.tokenize();
             if(result.status !== 'OK'){
@@ -394,6 +412,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
             }
             await submitCharge(result.token);
           } catch(e){
+            appleBtn.disabled = false;
             showErr(e.message || 'Apple Pay failed — try again.');
           }
         });
