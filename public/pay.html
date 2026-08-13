@@ -150,6 +150,19 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
 }
+/* ── Promo code field ── */
+.promo-row{display:flex;gap:8px;margin-bottom:6px}
+.promo-input{flex:1;background:var(--panel-2);border:1px solid var(--line-2);color:var(--text);font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:0 12px;height:44px;outline:none;transition:border-color .25s;width:0;-webkit-appearance:none}
+.promo-input::placeholder{color:var(--muted-2);text-transform:none;letter-spacing:normal;font-size:12px}
+.promo-input:focus{border-color:var(--accent-lift)}
+.promo-input:disabled{opacity:.5}
+.promo-apply{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;background:transparent;border:1px solid var(--line-2);color:var(--muted-2);padding:0 14px;height:44px;cursor:pointer;white-space:nowrap;transition:.25s var(--ease);flex-shrink:0}
+.promo-apply:hover:not(:disabled){border-color:var(--accent-lift);color:var(--accent-lift)}
+.promo-apply:disabled{opacity:.5;cursor:default}
+.promo-msg{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;margin-bottom:16px;display:none}
+.promo-msg.ok{display:block;color:#4ade80}
+.promo-msg.bad{display:block;color:#f87171}
+.orig-price{font-size:clamp(22px,5vw,32px);font-weight:800;letter-spacing:-.05em;line-height:1;opacity:.38;text-decoration:line-through;display:inline;margin-right:8px}
 </style>
 </head>
 <body>
@@ -206,6 +219,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
   /* Dollar amounts must match lib/square.js PRODUCT_PRICES (/100) */
   var DOLLAR_AMOUNTS = { access: '29.99', system: '59.99', control: '99.99' };
+  /* Prices in cents — mirrors lib/square.js PRODUCT_PRICES */
+  var BASE_PRICES = { access: 2999, system: 5999, control: 9999 };
+  /* Promo codes: key → multiplier (0.85 = 15% off) */
+  var PROMO_CODES    = { WIN: 0.85 };
+  var PROMO_USED_KEY = 'woa_promo_used';
+  var promoApplied   = null;
 
   var params    = new URLSearchParams(window.location.search);
   var initTier  = params.get('tier') || 'system';
@@ -217,15 +236,45 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   var CHK  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
   var LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
 
+  /* ── Effective price in cents after promo ── */
+  function effectiveCents(t){
+    var base = BASE_PRICES[t];
+    if(!promoApplied) return base;
+    var mult = PROMO_CODES[promoApplied];
+    return mult ? Math.round(base * mult) : base;
+  }
+
+  /* ── Sync Apple/Google Pay sheet to current price ── */
+  function syncPaymentRequest(){
+    if(!window._paymentRequest) return;
+    try {
+      var dollars = (effectiveCents(selectedTier) / 100).toFixed(2);
+      window._paymentRequest.update({ total: { amount: dollars, label: 'WinOnAny' } });
+    } catch(x){ console.warn('[pay] paymentRequest.update failed:', x.message); }
+  }
+
   /* ── Render dynamic tier info into #tierInfo ── */
   function renderTierInfo(t) {
     var d = TIERS[t];
     var feats = d.features.map(function(f){
       return '<li><span class="chk">'+CHK+'</span>'+f+'</li>';
     }).join('');
+    var priceHtml;
+    if(promoApplied){
+      var cents   = effectiveCents(t);
+      var dollars = Math.floor(cents / 100);
+      var cstr    = (cents % 100 < 10 ? '0' : '') + (cents % 100);
+      priceHtml =
+        '<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">' +
+          '<span class="orig-price">$'+d.dollars+'.'+d.cents+'</span>' +
+          '<div class="tier-price">$'+dollars+'<span class="cents">.'+cstr+'</span></div>' +
+        '</div>';
+    } else {
+      priceHtml = '<div class="tier-price">$'+d.dollars+'<span class="cents">.'+d.cents+'</span></div>';
+    }
     document.getElementById('tierInfo').innerHTML =
       '<span class="tier-badge">'+d.badge+'</span>' +
-      '<div class="tier-price">$'+d.dollars+'<span class="cents">.'+d.cents+'</span></div>' +
+      priceHtml +
       '<p class="tier-name">'+d.name+'</p>' +
       '<p class="tier-sum">'+d.summary+'</p>' +
       '<div class="div"></div>' +
@@ -266,6 +315,11 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
             '<label class="form-label" for="card-container">Card details</label>' +
             '<div id="card-container"></div>' +
           '</div>' +
+          '<div class="promo-row">' +
+            '<input class="promo-input" id="promoInput" type="text" placeholder="Promo code" maxlength="20" autocomplete="off" spellcheck="false">' +
+            '<button class="promo-apply" id="promoApplyBtn" type="button">Apply</button>' +
+          '</div>' +
+          '<p class="promo-msg" id="promoMsg"></p>' +
           '<button class="btn-pay" id="checkoutBtn" type="button" disabled>' +
             '<i class="spin" aria-hidden="true"></i>' +
             '<span class="btn-label">Complete Purchase</span>' +
@@ -279,6 +333,39 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
   renderTierInfo(initTier);
 
+  /* ── Promo code apply ── */
+  document.getElementById('promoApplyBtn').addEventListener('click', function(){
+    var input   = document.getElementById('promoInput');
+    var msg     = document.getElementById('promoMsg');
+    var applyBtn = document.getElementById('promoApplyBtn');
+    var code    = input.value.trim().toUpperCase();
+    if(!code){
+      msg.textContent = 'Enter a promo code.';
+      msg.className = 'promo-msg bad';
+      return;
+    }
+    if(!PROMO_CODES[code]){
+      msg.textContent = 'Invalid promo code.';
+      msg.className = 'promo-msg bad';
+      return;
+    }
+    try {
+      if(localStorage.getItem(PROMO_USED_KEY)){
+        msg.textContent = 'Code already redeemed on this device.';
+        msg.className = 'promo-msg bad';
+        return;
+      }
+    } catch(x){}
+    promoApplied      = code;
+    msg.textContent   = '15% off applied ✓';
+    msg.className     = 'promo-msg ok';
+    input.disabled    = true;
+    applyBtn.disabled = true;
+    applyBtn.textContent = 'Applied';
+    renderTierInfo(selectedTier);
+    syncPaymentRequest();
+  });
+
   /* ── Tier tab switching ── */
   document.getElementById('tierTabs').addEventListener('click', function(e){
     var tab = e.target.closest('[data-switch]');
@@ -290,13 +377,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       t.classList.toggle('active', t.getAttribute('data-switch') === newTier);
     });
     renderTierInfo(newTier);
-    if(window._paymentRequest){
-      try {
-        window._paymentRequest.update({
-          total: { amount: DOLLAR_AMOUNTS[newTier], label: 'WinOnAny' },
-        });
-      } catch(x){ console.warn('[pay] paymentRequest.update failed:', x.message); }
-    }
+    syncPaymentRequest();
   });
 
   var btn = document.getElementById('checkoutBtn');
@@ -312,13 +393,16 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   }
 
   async function submitCharge(sourceId){
+    var body = { sourceId: sourceId, tier: selectedTier };
+    if(promoApplied) body.promoCode = promoApplied;
     var charge = await fetch('/api/charge', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ sourceId: sourceId, tier: selectedTier }),
+      body:    JSON.stringify(body),
     }).then(function(r){ return r.json(); });
 
     if(charge.success){
+      if(promoApplied){ try{ localStorage.setItem(PROMO_USED_KEY, '1'); }catch(x){} }
       window.location.href = charge.redirectUrl;
     } else {
       throw new Error(charge.error || 'Payment failed — try again.');
