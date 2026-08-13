@@ -35,7 +35,10 @@ body{background:var(--void);color:var(--text);font-family:'Archivo',Arial,sans-s
   font-size:13.5px;font-weight:600;padding:13px 20px;text-decoration:none;border:0;cursor:pointer;
   font-family:'Archivo',Arial,sans-serif;transition:background .3s;-webkit-tap-highlight-color:transparent}
 .dl-link:hover{background:var(--accent-lift)}
+.dl-link:disabled{opacity:.5;cursor:not-allowed}
 .lock-msg{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2)}
+.err-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:10px 18px;font-size:13px;color:#F87171;display:none;max-width:90vw;text-align:center;z-index:99}
+.err-toast.show{display:block}
 </style>
 </head>
 <body>
@@ -55,52 +58,145 @@ body{background:var(--void);color:var(--text);font-family:'Archivo',Arial,sans-s
   <div class="files" id="files"></div>
 </main>
 
+<div class="err-toast" id="errToast"></div>
+
 <script>
-(function(){
+(function() {
+  var TOKEN_KEY = 'woa_token';
+
   var FILES = [
-    { key:'access',  label:'Starter',     title:'WinOnAny Starter',      desc:'The entry point. Openers, profile setup, and the core frameworks that move conversations forward.' },
-    { key:'system',  label:'The Vault',   title:'WinOnAny — The Vault',  desc:'Full platform playbooks, escalation strategies, conversation breakdowns, and situation-specific guides.' },
-    { key:'control', label:'Full Access', title:'WinOnAny — Full Access', desc:'Everything in The Vault plus advanced methods, real thread breakdowns, and every future drop.' },
+    { key: 'access',  label: 'Starter',     title: 'WinOnAny Starter',      desc: 'The entry point. Openers, profile setup, and the core frameworks that move conversations forward.' },
+    { key: 'system',  label: 'The Vault',   title: 'WinOnAny — The Vault',  desc: 'Full platform playbooks, escalation strategies, conversation breakdowns, and situation-specific guides.' },
+    { key: 'control', label: 'Full Access', title: 'WinOnAny — Full Access', desc: 'Everything in The Vault plus advanced methods, real thread breakdowns, and every future drop.' },
   ];
 
-  var TIER_RANK = { access:1, system:2, control:3 };
+  var TIER_RANK = { access: 1, system: 2, control: 3 };
 
-  function render(userTier){
-    var badge = document.getElementById('tierBadge');
+  // FIX: every request to /api/auth/me (and download) must send Authorization: Bearer <token>
+  // The old code did a bare fetch() with no headers — requireAuth returned 401 every time,
+  // the portal redirected to /login, creating the infinite loop.
+  function authFetch(url, opts) {
+    var token = localStorage.getItem(TOKEN_KEY);
+    return fetch(url, Object.assign({}, opts || {}, {
+      headers: Object.assign({}, (opts && opts.headers) || {}, {
+        'Authorization': token ? 'Bearer ' + token : '',
+        'Content-Type':  'application/json'
+      })
+    }));
+  }
+
+  var errToast = document.getElementById('errToast');
+  function showErr(msg) {
+    errToast.textContent = msg;
+    errToast.classList.add('show');
+    setTimeout(function() { errToast.classList.remove('show'); }, 4000);
+  }
+
+  // FIX: /api/download/account requires the Bearer header too.
+  // Plain <a href> can't send custom headers — intercept click, fetch with auth, pipe to blob.
+  function dlAccount(fileKey, btn) {
+    btn.disabled    = true;
+    btn.textContent = 'Downloading…';
+
+    authFetch('/api/download/account?file=' + encodeURIComponent(fileKey))
+    .then(function(r) {
+      if (r.status === 401) {
+        localStorage.removeItem(TOKEN_KEY);
+        window.location.href = '/login?next=/portal';
+        return null;
+      }
+      if (!r.ok) { throw new Error('Download failed (' + r.status + ')'); }
+      return r.blob();
+    })
+    .then(function(blob) {
+      if (!blob) return;
+      var url = URL.createObjectURL(blob);
+      var a   = document.createElement('a');
+      a.href     = url;
+      a.download = 'winonany-' + fileKey + '.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function() { URL.revokeObjectURL(url); }, 10000);
+      btn.disabled    = false;
+      btn.textContent = 'Download PDF →';
+    })
+    .catch(function(err) {
+      showErr(err.message || 'Download failed. Try again.');
+      btn.disabled    = false;
+      btn.textContent = 'Download PDF →';
+    });
+  }
+
+  function render(userTier) {
+    var badge     = document.getElementById('tierBadge');
     var container = document.getElementById('files');
-    var labels = { access:'Starter', system:'The Vault', control:'Full Access' };
-    badge.textContent = labels[userTier] || userTier;
+    var labels    = { access: 'Starter', system: 'The Vault', control: 'Full Access' };
+
+    badge.textContent = labels[userTier] || (userTier || 'No active plan');
     container.innerHTML = '';
 
-    FILES.forEach(function(f){
-      var unlocked = TIER_RANK[f.key] <= TIER_RANK[userTier];
-      var card = document.createElement('div');
+    FILES.forEach(function(f) {
+      var unlocked = userTier && TIER_RANK[f.key] <= TIER_RANK[userTier];
+      var card     = document.createElement('div');
       card.className = 'file-card' + (unlocked ? '' : ' locked');
+
+      var actionHtml;
+      if (unlocked) {
+        actionHtml = '<button class="dl-link" data-file="' + f.key + '">Download PDF →</button>';
+      } else {
+        actionHtml = '<p class="lock-msg">Upgrade to unlock</p>';
+      }
+
       card.innerHTML =
         '<p class="file-tier">' + f.label + '</p>' +
         '<h2>' + f.title + '</h2>' +
         '<p>' + f.desc + '</p>' +
-        (unlocked
-          ? '<a class="dl-link" href="/api/download/account?file=' + f.key + '">Download PDF →</a>'
-          : '<p class="lock-msg">Upgrade to unlock</p>');
+        actionHtml;
+
+      if (unlocked) {
+        var btn = card.querySelector('.dl-link');
+        btn.addEventListener('click', function() {
+          dlAccount(f.key, btn);
+        });
+      }
+
       container.appendChild(card);
     });
   }
 
-  // Check auth
-  fetch('/api/auth/me')
-  .then(function(r){
-    if(r.status === 401){ window.location.href = '/login'; return null; }
+  // Boot: guard before any fetch
+  var token = localStorage.getItem(TOKEN_KEY);
+  if (!token) {
+    window.location.href = '/login?next=/portal';
+    return;
+  }
+
+  authFetch('/api/auth/me')
+  .then(function(r) {
+    if (r.status === 401) {
+      localStorage.removeItem(TOKEN_KEY);
+      window.location.href = '/login?next=/portal';
+      return null;
+    }
     return r.json();
   })
-  .then(function(d){
-    if(d) render(d.tier);
+  .then(function(d) {
+    if (d && d.user) render(d.user.tier);
   })
-  .catch(function(){ window.location.href = '/login'; });
+  .catch(function() {
+    window.location.href = '/login?next=/portal';
+  });
 
-  // Logout
-  document.getElementById('logoutBtn').addEventListener('click', function(){
-    fetch('/api/auth/logout',{method:'POST'}).then(function(){ window.location.href='/'; });
+  document.getElementById('logoutBtn').addEventListener('click', function() {
+    var t = localStorage.getItem(TOKEN_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+    fetch('/api/auth/logout', {
+      method: 'POST',
+      headers: { 'Authorization': t ? 'Bearer ' + t : '' }
+    }).finally(function() {
+      window.location.href = '/';
+    });
   });
 })();
 </script>
