@@ -215,6 +215,26 @@ p{margin:0}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
   .reveal,.b{opacity:1!important;transform:none!important}
 }
+/* ── Promo popup ── */
+#promoOverlay{position:fixed;inset:0;z-index:200;background:rgba(5,5,7,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
+#promoOverlay.show{opacity:1;pointer-events:auto}
+#promoModal{background:var(--panel);border:1px solid var(--line-2);max-width:400px;width:100%;position:relative;padding:0}
+#promoModal::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent 0%,var(--accent) 40%,var(--accent-lift) 60%,transparent 100%)}
+@keyframes promoIn{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+#promoOverlay.show #promoModal{animation:promoIn .5s var(--ease) both}
+.promo-close{position:absolute;top:12px;right:14px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--muted-2);transition:color .2s;font-size:20px;line-height:1;z-index:1}
+.promo-close:hover{color:var(--text)}
+.promo-body{padding:36px 28px 28px}
+.promo-tag{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-lift);margin-bottom:12px}
+.promo-title{font-size:clamp(20px,4vw,26px);font-weight:800;letter-spacing:-.04em;line-height:1.1;margin:0 0 18px}
+.promo-code-wrap{background:var(--panel-2);border:1px solid var(--accent-line);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px}
+.promo-code{font-family:var(--mono);font-size:22px;font-weight:500;letter-spacing:.18em;color:var(--accent-lift)}
+.promo-copy{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2);background:transparent;border:1px solid var(--line-2);padding:6px 10px;cursor:pointer;transition:.25s var(--ease);flex-shrink:0}
+.promo-copy:hover{border-color:var(--accent-lift);color:var(--accent-lift)}
+.promo-fine{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2);margin-bottom:20px}
+.promo-cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:52px;background:var(--accent);color:#fff;font-size:15px;font-weight:700;letter-spacing:.01em;border:0;transition:.35s var(--ease);cursor:pointer}
+.promo-cta:hover{background:var(--accent-lift);box-shadow:0 14px 46px -14px rgba(110,86,248,.85)}
+.promo-cta:active{transform:scale(.97)}
 </style>
 </head>
 <body>
@@ -462,6 +482,21 @@ p{margin:0}
   </div>
 </footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="promoOverlay" role="dialog" aria-modal="true" aria-label="Limited offer">
+  <div id="promoModal">
+    <button class="promo-close" id="promoClose" aria-label="Close offer">&times;</button>
+    <div class="promo-body">
+      <p class="promo-tag">Limited offer</p>
+      <h2 class="promo-title">15% off your<br>first purchase.</h2>
+      <div class="promo-code-wrap">
+        <span class="promo-code">WIN</span>
+        <button class="promo-copy" id="promoCopyBtn">Copy</button>
+      </div>
+      <p class="promo-fine">One-time use &nbsp;·&nbsp; New customers only</p>
+      <button class="promo-cta" id="promoCTA">Unlock The Vault &nbsp;→</button>
+    </div>
+  </div>
+</div>
 <script>
 (function(){
   'use strict';
@@ -610,6 +645,46 @@ p{margin:0}
   }
 
   document.getElementById('yr').textContent = new Date().getFullYear();
+
+  /* ── Promo popup ── */
+  (function(){
+    var PROMO_SEEN = 'woa_promo_seen';
+    try{ if(localStorage.getItem(PROMO_SEEN)) return; } catch(x){ return; }
+    var overlay = document.getElementById('promoOverlay');
+    if(!overlay) return;
+    var active = false;
+    setTimeout(function(){
+      overlay.classList.add('show');
+      active = true;
+    }, 2200);
+    function close(){
+      overlay.classList.remove('show');
+      try{ localStorage.setItem(PROMO_SEEN, '1'); } catch(x){}
+    }
+    document.getElementById('promoClose').addEventListener('click', close);
+    overlay.addEventListener('click', function(e){ if(e.target === overlay) close(); });
+    document.addEventListener('keydown', function(e){ if(active && e.key === 'Escape') close(); });
+    document.getElementById('promoCopyBtn').addEventListener('click', function(){
+      var copyBtn = document.getElementById('promoCopyBtn');
+      var code = 'WIN';
+      function done(){ copyBtn.textContent = 'Copied!'; }
+      function fallback(text, cb){
+        var el = document.createElement('textarea');
+        el.value = text;
+        el.style.cssText = 'position:fixed;top:-999px;opacity:0';
+        document.body.appendChild(el); el.select();
+        try{ document.execCommand('copy'); cb(); } catch(x){}
+        document.body.removeChild(el);
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(code).then(done).catch(function(){ fallback(code, done); });
+      } else { fallback(code, done); }
+    });
+    document.getElementById('promoCTA').addEventListener('click', function(){
+      close();
+      window.location.href = '/pay?tier=system';
+    });
+  })();
 })();
 </script>
 </body>
