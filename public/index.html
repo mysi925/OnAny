@@ -451,6 +451,33 @@ p{margin:0}
    VAULT TILE ART — premium SVG backgrounds
    ══════════════════════════════════════════ */
 .tile .art{background-size:cover!important;background-position:center!important}
+
+/* ── vault tile v2 — readable content, premium dark ── */
+.tile { cursor: pointer; }
+.tile .art { background-size: cover; background-position: center; }
+/* Remove the heavy veil darkness so content reads through */
+.tile .veil {
+  background: linear-gradient(180deg,
+    rgba(5,5,7,.12) 0%,
+    rgba(5,5,7,.18) 45%,
+    rgba(5,5,7,.72) 80%,
+    rgba(5,5,7,.92) 100%
+  ) !important;
+}
+/* Lock badge — small, top-right, unobtrusive */
+.tile .lock {
+  top: 12px; right: 12px;
+  background: rgba(5,5,7,.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-color: rgba(255,255,255,.18);
+  font-size: 9px; padding: 4px 8px; gap: 5px;
+}
+.tile:hover .lock {
+  background: rgba(110,86,248,.25);
+  border-color: var(--accent);
+  color: #fff;
+}
 </style>
 </head>
 <body>
@@ -582,52 +609,6 @@ p{margin:0}
     </div>
   </div>
 </section>
-<section class="section" id="system">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow">The playbook <b>&nbsp;/&nbsp;</b> How it works</p>
-      <h2>Every situation.<br>Covered.</h2>
-      <p class="lead">The exact moments every guy gets stuck in. Scripts and breakdowns for each one — not generic advice.</p>
-    </div>
-    <div class="steps reveal" style="--d:.08s">
-      <article class="step"><p class="num">01</p><h3>Profile Advantage</h3><p class="sdesc">Before you say anything she's already decided. This is how you make sure it goes your way.</p></article>
-      <article class="step"><p class="num">02</p><h3>Opening Vault</h3><p class="sdesc">The first message either opens the door or closes it. Real openers that set the right tone from the start.</p></article>
-      <article class="step"><p class="num">03</p><h3>Conversation Game</h3><p class="sdesc">She's interested but won't move. She went cold after things were going good. She keeps redirecting. Covered.</p></article>
-      <article class="step"><p class="num">04</p><h3>Momentum Control</h3><p class="sdesc">When she's ready. How to ask without killing it. What to say right after she sends. What to do when she stops.</p></article>
-      <article class="step"><p class="num">05</p><h3>Platform Playbooks</h3><p class="sdesc">Same situations play out on every app. The playbook adapts to wherever the conversation is happening.</p></article>
-    </div>
-  </div>
-</section>
-<section class="section" id="vault">
-  <div class="wrap">
-    <div class="sec-head vault-head reveal" style="max-width:none">
-      <div style="display:flex;flex-direction:column;gap:16px;max-width:560px">
-        <p class="eyebrow">The vault <b>&nbsp;/&nbsp;</b> Private archive</p>
-        <h2>The library most<br>people never see.</h2>
-      </div>
-      <p class="lead" style="max-width:36ch">Scripts, breakdowns, and strategies. Locked until you're in.</p>
-    </div>
-    <div class="vault reveal" style="--d:.08s" id="vaultGrid">
-      <article class="tile" tabindex="0" role="button" aria-label="Snap Fast Track — locked"><i class="art" style="position:absolute;inset:0;overflow:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%"><defs><filter id="f1"><feGaussianBlur stdDeviation="3.5"/></filter><filter id="f1b"><feGaussianBlur stdDeviation="1.8"/></filter><linearGradient id="syel" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#FFFC00" stop-opacity=".92"/><stop offset="100%" stop-color="#FFE000" stop-opacity=".85"/></linearGradient></defs><rect width="400" height="300" fill="#0c0a01"/><ellipse cx="200" cy="260" rx="200" ry="80" fill="#FFFC00" fill-opacity=".09" filter="url(#f1)"/><ellipse cx="200" cy="240" rx="100" ry="50" fill="#FFFC00" fill-opacity=".06" filter="url(#f1)"/><rect x="128" y="28" width="144" height="234" rx="20" fill="none" stroke="rgba(255,252,0,.2)" stroke-width="1.5"/><rect x="138" y="44" width="124" height="202" rx="10" fill="rgba(255,252,0,.035)"/><circle cx="184" cy="37" r="2.5" fill="rgba(255,252,0,.35)"/><rect x="191" y="35.5" width="22" height="3" rx="1.5" fill="rgba(255,252,0,.22)"/><rect x="180" y="65" width="74" height="28" rx="14" fill="url(#syel)" filter="url(#f1b)"/><rect x="146" y="103" width="96" height="24" rx="12" fill="rgba(255,255,255,.075)" stroke="rgba(255,255,255,.1)" stroke-width=".8"/><rect x="170" y="137" width="74" height="28" rx="14" fill="url(#syel)" filter="url(#f1b)" opacity=".9"/><rect x="144" y="175" width="106" height="24" rx="12" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.09)" stroke-width=".8"/><rect x="146" y="208" width="56" height="22" rx="11" fill="rgba(255,255,255,.055)" stroke="rgba(255,255,255,.08)" stroke-width=".8"/><circle cx="160" cy="219" r="2.8" fill="rgba(255,255,255,.38)"/><circle cx="170" cy="219" r="2.8" fill="rgba(255,255,255,.38)"/><circle cx="180" cy="219" r="2.8" fill="rgba(255,255,255,.38)"/><text x="338" y="58" font-size="44" fill="rgba(255,252,0,.07)" font-family="system-ui">👻</text><line x1="128" y1="248" x2="272" y2="248" stroke="rgba(255,252,0,.1)" stroke-width=".8"/></svg></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Snapchat</p><h3 class="ttitle">Snap: Fast Track</h3></article>
-      <article class="tile" tabindex="0" role="button" aria-label="IG DM Vault — locked"><i class="art" style="position:absolute;inset:0;overflow:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%"><defs><filter id="f2"><feGaussianBlur stdDeviation="4"/></filter><filter id="f2b"><feGaussianBlur stdDeviation="1.8"/></filter><linearGradient id="igr" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#F58529"/><stop offset="35%" stop-color="#DD2A7B"/><stop offset="70%" stop-color="#8134AF"/><stop offset="100%" stop-color="#515BD4"/></linearGradient><linearGradient id="igm" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#DD2A7B" stop-opacity=".88"/><stop offset="100%" stop-color="#8134AF" stop-opacity=".82"/></linearGradient></defs><rect width="400" height="300" fill="#0d0510"/><ellipse cx="310" cy="240" rx="180" ry="100" fill="#DD2A7B" fill-opacity=".1" filter="url(#f2)"/><ellipse cx="80" cy="70" rx="130" ry="80" fill="#515BD4" fill-opacity=".09" filter="url(#f2)"/><rect x="58" y="18" width="284" height="264" rx="18" fill="rgba(255,255,255,.022)" stroke="rgba(255,255,255,.07)" stroke-width="1"/><circle cx="100" cy="54" r="17" fill="rgba(255,255,255,.05)" stroke="url(#igr)" stroke-width="1.5"/><ellipse cx="100" cy="49" rx="7" ry="8" fill="rgba(255,255,255,.1)"/><ellipse cx="100" cy="62" rx="12" ry="7" fill="rgba(255,255,255,.07)"/><rect x="126" y="44" width="70" height="8" rx="4" fill="rgba(255,255,255,.18)"/><rect x="126" y="57" width="44" height="6" rx="3" fill="rgba(255,255,255,.08)"/><line x1="74" y1="80" x2="326" y2="80" stroke="rgba(255,255,255,.06)" stroke-width=".8"/><rect x="82" y="96" width="116" height="26" rx="13" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.09)" stroke-width=".8"/><rect x="202" y="132" width="120" height="26" rx="13" fill="url(#igm)" filter="url(#f2b)"/><rect x="82" y="168" width="96" height="26" rx="13" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.08)" stroke-width=".8"/><rect x="214" y="204" width="108" height="26" rx="13" fill="url(#igm)" filter="url(#f2b)" opacity=".9"/><rect x="82" y="244" width="62" height="22" rx="11" fill="rgba(255,255,255,.045)" stroke="rgba(255,255,255,.07)" stroke-width=".8"/><circle cx="98" cy="255" r="2.8" fill="rgba(255,255,255,.35)"/><circle cx="109" cy="255" r="2.8" fill="rgba(255,255,255,.35)"/><circle cx="120" cy="255" r="2.8" fill="rgba(255,255,255,.35)"/><rect x="316" y="26" width="34" height="34" rx="9" fill="none" stroke="url(#igr)" stroke-width="1.2" opacity=".22"/><circle cx="333" cy="43" r="9" fill="none" stroke="url(#igr)" stroke-width="1.2" opacity=".22"/><circle cx="341.5" cy="34.5" r="2.2" fill="#DD2A7B" opacity=".22"/></svg></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Instagram</p><h3 class="ttitle">IG: From DM to Private</h3></article>
-      <article class="tile" tabindex="0" role="button" aria-label="Tinder Match to Win — locked"><i class="art" style="position:absolute;inset:0;overflow:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%"><defs><filter id="f3"><feGaussianBlur stdDeviation="5"/></filter><filter id="f3b"><feGaussianBlur stdDeviation="2"/></filter><linearGradient id="tfi" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#FF4458"/><stop offset="100%" stop-color="#FF7043"/></linearGradient><linearGradient id="tyo" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#FF4458"/><stop offset="100%" stop-color="#FF6B35"/></linearGradient></defs><rect width="400" height="300" fill="#0a0608"/><ellipse cx="200" cy="290" rx="230" ry="110" fill="#FF4458" fill-opacity=".11" filter="url(#f3)"/><rect x="112" y="40" width="176" height="128" rx="14" fill="rgba(255,68,88,.05)" stroke="rgba(255,68,88,.12)" stroke-width="1" transform="rotate(-5 200 104)"/><rect x="112" y="40" width="176" height="128" rx="14" fill="rgba(18,8,10,.92)" stroke="rgba(255,68,88,.18)" stroke-width="1" transform="rotate(2 200 104)"/><rect x="112" y="40" width="176" height="128" rx="14" fill="rgba(14,6,8,.96)" stroke="rgba(255,68,88,.28)" stroke-width="1.2"/><circle cx="200" cy="86" r="26" fill="rgba(255,68,88,.07)" stroke="rgba(255,68,88,.18)" stroke-width="1"/><ellipse cx="200" cy="78" rx="11" ry="13" fill="rgba(255,68,88,.18)"/><ellipse cx="200" cy="100" rx="19" ry="11" fill="rgba(255,68,88,.12)"/><rect x="156" y="124" width="88" height="8" rx="4" fill="rgba(255,255,255,.16)"/><rect x="168" y="138" width="64" height="6" rx="3" fill="rgba(255,255,255,.07)"/><rect x="135" y="162" width="130" height="32" rx="16" fill="url(#tfi)" opacity=".88" filter="url(#f3b)"/><text x="200" y="183" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="-apple-system,sans-serif" letter-spacing="2.5">IT'S A MATCH</text><rect x="72" y="210" width="120" height="26" rx="13" fill="rgba(255,255,255,.065)" stroke="rgba(255,255,255,.08)" stroke-width=".8"/><rect x="208" y="246" width="120" height="26" rx="13" fill="url(#tyo)" opacity=".72" filter="url(#f3b)"/><path d="M344 30 q8-14 12-6 q2-10 8-4 q6-12 14 2 q0 14-14 20 q-6 6-14-4 q-4 2-6-8z" fill="rgba(255,68,88,.12)" transform="translate(0,0)"/></svg></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Tinder</p><h3 class="ttitle">Tinder: Match to Win</h3></article>
-      <article class="tile" tabindex="0" role="button" aria-label="Getting Her There — locked"><i class="art" style="position:absolute;inset:0;overflow:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%"><defs><filter id="f4"><feGaussianBlur stdDeviation="5"/></filter><filter id="f4b"><feGaussianBlur stdDeviation="2"/></filter><linearGradient id="epu" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#6E56F8"/><stop offset="100%" stop-color="#9A4AC8"/></linearGradient><linearGradient id="epu2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8B78FF"/><stop offset="100%" stop-color="#B06AE8"/></linearGradient></defs><rect width="400" height="300" fill="#080612"/><ellipse cx="200" cy="150" rx="160" ry="120" fill="#6E56F8" fill-opacity=".14" filter="url(#f4)"/><ellipse cx="200" cy="150" rx="70" ry="55" fill="#8B78FF" fill-opacity=".07" filter="url(#f4)"/><rect x="56" y="226" width="134" height="24" rx="12" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.08)" stroke-width=".8"/><rect x="210" y="192" width="134" height="24" rx="12" fill="url(#epu)" opacity=".42" filter="url(#f4b)"/><rect x="76" y="160" width="134" height="24" rx="12" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.09)" stroke-width=".8"/><rect x="190" y="126" width="154" height="24" rx="12" fill="url(#epu)" opacity=".58" filter="url(#f4b)"/><rect x="56" y="94" width="154" height="24" rx="12" fill="rgba(255,255,255,.08)" stroke="rgba(139,120,255,.22)" stroke-width=".8"/><rect x="166" y="56" width="178" height="28" rx="14" fill="url(#epu2)" opacity=".82" filter="url(#f4b)"/><polyline points="56,238 100,205 210,204 250,143 210,107 170,70" fill="none" stroke="url(#epu)" stroke-width="1.2" stroke-dasharray="4,7" opacity=".38"/><circle cx="170" cy="70" r="7" fill="#8B78FF" opacity=".65" filter="url(#f4b)"/><circle cx="170" cy="70" r="3.5" fill="#fff" opacity=".55"/><circle cx="56" cy="238" r="4" fill="rgba(255,255,255,.15)"/></svg></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Escalation</p><h3 class="ttitle">Getting Her There</h3></article>
-      <article class="tile" tabindex="0" role="button" aria-label="When & How to Ask — locked"><i class="art" style="position:absolute;inset:0;overflow:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%"><defs><filter id="f5"><feGaussianBlur stdDeviation="4.5"/></filter><filter id="f5b"><feGaussianBlur stdDeviation="1.8"/></filter><linearGradient id="aro" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#C84B8C"/><stop offset="100%" stop-color="#8B78FF"/></linearGradient><linearGradient id="apu" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#6E56F8"/><stop offset="100%" stop-color="#9A4AC8"/></linearGradient></defs><rect width="400" height="300" fill="#0d0610"/><ellipse cx="300" cy="200" rx="180" ry="120" fill="#C84B8C" fill-opacity=".09" filter="url(#f5)"/><ellipse cx="100" cy="100" rx="140" ry="90" fill="#6E56F8" fill-opacity=".08" filter="url(#f5)"/><rect x="38" y="56" width="124" height="196" rx="18" fill="rgba(255,255,255,.025)" stroke="rgba(200,75,140,.2)" stroke-width="1.2"/><rect x="48" y="70" width="104" height="168" rx="10" fill="rgba(200,75,140,.035)"/><rect x="238" y="56" width="124" height="196" rx="18" fill="rgba(255,255,255,.025)" stroke="rgba(110,86,248,.2)" stroke-width="1.2"/><rect x="248" y="70" width="104" height="168" rx="10" fill="rgba(110,86,248,.035)"/><rect x="58" y="94" width="84" height="20" rx="10" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.07)" stroke-width=".8"/><rect x="68" y="124" width="72" height="20" rx="10" fill="url(#aro)" opacity=".52" filter="url(#f5b)"/><rect x="58" y="154" width="90" height="20" rx="10" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.07)" stroke-width=".8"/><rect x="54" y="186" width="100" height="28" rx="14" fill="url(#aro)" opacity=".82" filter="url(#f5b)"/><rect x="58" y="222" width="62" height="14" rx="7" fill="rgba(255,255,255,.055)"/><rect x="258" y="94" width="84" height="20" rx="10" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.06)" stroke-width=".8"/><rect x="258" y="124" width="90" height="20" rx="10" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.06)" stroke-width=".8"/><rect x="258" y="186" width="100" height="28" rx="14" fill="url(#apu)" opacity=".78" filter="url(#f5b)"/><rect x="266" y="222" width="70" height="14" rx="7" fill="rgba(110,86,248,.14)"/><path d="M162,200 Q200,182 238,200" fill="none" stroke="url(#aro)" stroke-width="1.2" stroke-dasharray="3,5" opacity=".55"/><circle cx="200" cy="196" r="5.5" fill="#C84B8C" opacity=".55" filter="url(#f5b)"/><circle cx="200" cy="196" r="2.8" fill="#fff" opacity=".5"/></svg></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">The Ask</p><h3 class="ttitle">When &amp; How to Ask</h3></article>
-      <article class="tile" tabindex="0" role="button" aria-label="Real Thread Breakdowns — locked"><i class="art" style="position:absolute;inset:0;overflow:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%"><defs><filter id="f6"><feGaussianBlur stdDeviation="5"/></filter><filter id="f6b"><feGaussianBlur stdDeviation="1.5"/></filter><linearGradient id="bbl" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1E7BC4"/><stop offset="100%" stop-color="#4A90D9"/></linearGradient><linearGradient id="bpu" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#6E56F8"/><stop offset="100%" stop-color="#8B78FF"/></linearGradient></defs><rect width="400" height="300" fill="#060810"/><ellipse cx="80" cy="220" rx="160" ry="110" fill="#1E4E8C" fill-opacity=".14" filter="url(#f6)"/><ellipse cx="330" cy="80" rx="120" ry="80" fill="#6E56F8" fill-opacity=".1" filter="url(#f6)"/><rect x="76" y="18" width="164" height="264" rx="20" fill="rgba(255,255,255,.022)" stroke="rgba(30,123,196,.2)" stroke-width="1.2"/><rect x="86" y="32" width="144" height="236" rx="12" fill="rgba(10,14,24,.82)"/><rect x="98" y="50" width="92" height="18" rx="9" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.07)" stroke-width=".8"/><rect x="158" y="78" width="62" height="18" rx="9" fill="url(#bpu)" opacity=".65" filter="url(#f6b)"/><rect x="98" y="106" width="104" height="18" rx="9" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.06)" stroke-width=".8"/><rect x="146" y="134" width="84" height="18" rx="9" fill="url(#bpu)" opacity=".7" filter="url(#f6b)"/><rect x="98" y="162" width="88" height="18" rx="9" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.06)" stroke-width=".8"/><rect x="146" y="190" width="84" height="24" rx="12" fill="url(#bpu)" opacity=".86" filter="url(#f6b)"/><rect x="98" y="224" width="62" height="16" rx="8" fill="rgba(255,255,255,.05)"/><line x1="242" y1="87" x2="290" y2="80" stroke="rgba(30,123,196,.55)" stroke-width="1" stroke-dasharray="3,3"/><circle cx="290" cy="80" r="3.5" fill="#1E7BC4" opacity=".65"/><rect x="294" y="70" width="84" height="20" rx="5" fill="rgba(30,123,196,.1)" stroke="rgba(30,123,196,.28)" stroke-width=".8"/><rect x="300" y="77" width="58" height="6" rx="3" fill="rgba(30,123,196,.38)"/><line x1="232" y1="143" x2="290" y2="150" stroke="rgba(110,86,248,.55)" stroke-width="1" stroke-dasharray="3,3"/><circle cx="290" cy="150" r="3.5" fill="#6E56F8" opacity=".65"/><rect x="294" y="140" width="84" height="20" rx="5" fill="rgba(110,86,248,.09)" stroke="rgba(110,86,248,.28)" stroke-width=".8"/><rect x="300" y="147" width="46" height="6" rx="3" fill="rgba(110,86,248,.38)"/><line x1="232" y1="202" x2="290" y2="212" stroke="rgba(139,120,255,.75)" stroke-width="1.2" stroke-dasharray="3,3"/><circle cx="290" cy="212" r="4.5" fill="#8B78FF" opacity=".82"/><rect x="294" y="200" width="84" height="24" rx="5" fill="rgba(110,86,248,.14)" stroke="rgba(139,120,255,.42)" stroke-width=".8"/><rect x="300" y="207" width="62" height="6" rx="3" fill="rgba(139,120,255,.52)"/><rect x="300" y="217" width="42" height="4" rx="2" fill="rgba(139,120,255,.3)"/></svg></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Breakdowns</p><h3 class="ttitle">Real Thread Breakdowns</h3></article>
-    </div>
-  </div>
-</section>
-<section class="section" id="reviews">
-  <div class="wrap">
-    <div class="sec-head reveal"><p class="eyebrow">What they said</p><h2>Results speak.</h2></div>
-    <div class="reviews-grid reveal" style="--d:.08s">
-      <article class="review"><p class="review-text">"Tinder was basically dead for me. Used the playbook for a week and had girls sending me stuff I never expected. The platform breakdowns are insane."</p><p class="review-name">— Marcus D., 19</p></article>
-      <article class="review"><p class="review-text">"Snap is a different game once you know what you're doing. Got my first real win within 3 days. The escalation section is what does it."</p><p class="review-name">— Jake M., 20</p></article>
-      <article class="review"><p class="review-text">"I've tried everything. This is the only thing that actually moves conversations to where you want them to go. IG specifically is locked in."</p><p class="review-name">— Tyler R., 21</p></article>
-      <article class="review"><p class="review-text">"Didn't think Hinge could go there but the guide changed that. Girls I matched with months ago started sending. Worth every dollar."</p><p class="review-name">— Ryan K., 22</p></article>
-    </div>
-  </div>
-</section>
 <section class="section" id="pricing">
   <div class="wrap">
     <div class="sec-head reveal">
@@ -673,6 +654,308 @@ p{margin:0}
         </ul>
         <button class="btn btn-ghost" data-tier="control">Get full access</button>
       </article>
+    </div>
+  </div>
+</section>
+<section class="section" id="system">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow">The playbook <b>&nbsp;/&nbsp;</b> How it works</p>
+      <h2>Every situation.<br>Covered.</h2>
+      <p class="lead">The exact moments every guy gets stuck in. Scripts and breakdowns for each one — not generic advice.</p>
+    </div>
+    <div class="steps reveal" style="--d:.08s">
+      <article class="step"><p class="num">01</p><h3>Profile Advantage</h3><p class="sdesc">Before you say anything she's already decided. This is how you make sure it goes your way.</p></article>
+      <article class="step"><p class="num">02</p><h3>Opening Vault</h3><p class="sdesc">The first message either opens the door or closes it. Real openers that set the right tone from the start.</p></article>
+      <article class="step"><p class="num">03</p><h3>Conversation Game</h3><p class="sdesc">She's interested but won't move. She went cold after things were going good. She keeps redirecting. Covered.</p></article>
+      <article class="step"><p class="num">04</p><h3>Momentum Control</h3><p class="sdesc">When she's ready. How to ask without killing it. What to say right after she sends. What to do when she stops.</p></article>
+      <article class="step"><p class="num">05</p><h3>Platform Playbooks</h3><p class="sdesc">Same situations play out on every app. The playbook adapts to wherever the conversation is happening.</p></article>
+    </div>
+  </div>
+</section>
+<section class="section" id="vault">
+  <div class="wrap">
+    <div class="sec-head vault-head reveal" style="max-width:none">
+      <div style="display:flex;flex-direction:column;gap:16px;max-width:560px">
+        <p class="eyebrow">The vault <b>&nbsp;/&nbsp;</b> Private archive</p>
+        <h2>The library most<br>people never see.</h2>
+      </div>
+      <p class="lead" style="max-width:36ch">Scripts, breakdowns, and strategies. Locked until you're in.</p>
+    </div>
+    <div class="vault reveal" style="--d:.08s" id="vaultGrid">
+      <article class="tile" tabindex="0" role="button" aria-label="Snap Fast Track — locked"><i class="art" style="position:absolute;inset:0;overflow:hidden"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;display:block">
+<rect width="400" height="300" fill="#0d0b00"/>
+<rect width="400" height="300" fill="url(#s_bg)"/>
+<defs>
+  <linearGradient id="s_bg" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#FFFC00" stop-opacity=".12"/><stop offset="60%" stop-color="#FFFC00" stop-opacity="0"/></linearGradient>
+  <linearGradient id="s_yel" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#FFFC00"/><stop offset="100%" stop-color="#FFD600"/></linearGradient>
+</defs>
+<!-- header bar -->
+<rect x="0" y="0" width="400" height="44" fill="rgba(255,252,0,.06)"/>
+<text x="20" y="27" font-size="11" fill="rgba(255,252,0,.9)" font-family="-apple-system,sans-serif" font-weight="700" letter-spacing="1.5">SNAPCHAT</text>
+<text x="360" y="27" font-size="10" fill="rgba(255,252,0,.55)" font-family="-apple-system,sans-serif" text-anchor="end">🔥 47</text>
+<line x1="0" y1="44" x2="400" y2="44" stroke="rgba(255,252,0,.12)" stroke-width=".8"/>
+<!-- opener label -->
+<text x="20" y="70" font-size="9" fill="rgba(255,252,0,.45)" font-family="-apple-system,monospace" letter-spacing="1.5">OPENER THAT GETS BACK</text>
+<!-- YOU bubble — readable -->
+<rect x="20" y="80" width="240" height="38" rx="10" fill="url(#s_yel)"/>
+<text x="34" y="97" font-size="12" fill="#000" font-family="-apple-system,sans-serif" font-weight="600">you looked way too</text>
+<text x="34" y="112" font-size="12" fill="#000" font-family="-apple-system,sans-serif" font-weight="600">comfortable in that pic 👀</text>
+<!-- THEM reply -->
+<rect x="20" y="128" width="160" height="30" rx="10" fill="rgba(255,255,255,.1)" stroke="rgba(255,255,255,.14)" stroke-width=".8"/>
+<text x="34" y="148" font-size="12" fill="rgba(255,255,255,.85)" font-family="-apple-system,sans-serif">comfortable how 😏</text>
+<!-- YOU second line -->
+<rect x="20" y="168" width="220" height="30" rx="10" fill="url(#s_yel)"/>
+<text x="34" y="188" font-size="12" fill="#000" font-family="-apple-system,sans-serif" font-weight="600">like you knew exactly what you were doing</text>
+<!-- typing -->
+<rect x="20" y="208" width="62" height="26" rx="13" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.1)" stroke-width=".8"/>
+<circle cx="36" cy="221" r="3" fill="rgba(255,252,0,.7)"><animate attributeName="opacity" values=".2;1;.2" dur="1.1s" repeatCount="indefinite"/></circle>
+<circle cx="47" cy="221" r="3" fill="rgba(255,252,0,.7)"><animate attributeName="opacity" values=".2;1;.2" dur="1.1s" begin=".18s" repeatCount="indefinite"/></circle>
+<circle cx="58" cy="221" r="3" fill="rgba(255,252,0,.7)"><animate attributeName="opacity" values=".2;1;.2" dur="1.1s" begin=".36s" repeatCount="indefinite"/></circle>
+<!-- right side: script labels -->
+<rect x="292" y="56" width="96" height="180" rx="8" fill="rgba(255,252,0,.04)" stroke="rgba(255,252,0,.1)" stroke-width=".7"/>
+<text x="340" y="76" text-anchor="middle" font-size="8" fill="rgba(255,252,0,.5)" font-family="-apple-system,monospace" letter-spacing="1" font-weight="700">INSIDE</text>
+<line x1="300" y1="82" x2="380" y2="82" stroke="rgba(255,252,0,.08)" stroke-width=".5"/>
+<text x="302" y="100" font-size="9" fill="rgba(255,252,0,.4)" font-family="-apple-system,sans-serif">Fast openers ✓</text>
+<text x="302" y="118" font-size="9" fill="rgba(255,252,0,.4)" font-family="-apple-system,sans-serif">Streak scripts ✓</text>
+<text x="302" y="136" font-size="9" fill="rgba(255,252,0,.4)" font-family="-apple-system,sans-serif">Streak recovery ✓</text>
+<text x="302" y="154" font-size="9" fill="rgba(255,252,0,.4)" font-family="-apple-system,sans-serif">Story replies ✓</text>
+<text x="302" y="172" font-size="9" fill="rgba(255,252,0,.4)" font-family="-apple-system,sans-serif">Escalation ✓</text>
+<text x="302" y="190" font-size="9" fill="rgba(255,252,0,.4)" font-family="-apple-system,sans-serif">Cam strats ✓</text>
+<text x="302" y="208" font-size="9" fill="rgba(255,252,0,.4)" font-family="-apple-system,sans-serif">47 scripts ✓</text>
+</svg></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Snapchat</p><h3 class="ttitle">Snap: Fast Track</h3></article>
+      <article class="tile" tabindex="0" role="button" aria-label="IG DM Vault — locked"><i class="art" style="position:absolute;inset:0;overflow:hidden"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;display:block">
+<defs>
+  <linearGradient id="ig_bg" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#DD2A7B" stop-opacity=".16"/><stop offset="50%" stop-color="#8134AF" stop-opacity=".08"/><stop offset="100%" stop-color="#515BD4" stop-opacity="0"/></linearGradient>
+  <linearGradient id="ig_msg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#DD2A7B"/><stop offset="100%" stop-color="#8134AF"/></linearGradient>
+  <linearGradient id="ig_ring" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#F58529"/><stop offset="35%" stop-color="#DD2A7B"/><stop offset="70%" stop-color="#8134AF"/><stop offset="100%" stop-color="#515BD4"/></linearGradient>
+</defs>
+<rect width="400" height="300" fill="#0c040e"/>
+<rect width="400" height="300" fill="url(#ig_bg)"/>
+<!-- header -->
+<rect x="0" y="0" width="400" height="44" fill="rgba(221,42,123,.08)"/>
+<circle cx="36" cy="22" r="14" fill="rgba(255,255,255,.06)" stroke="url(#ig_ring)" stroke-width="2"/>
+<ellipse cx="36" cy="18" rx="5" ry="6" fill="rgba(255,255,255,.18)"/>
+<ellipse cx="36" cy="28" rx="9" ry="5" fill="rgba(255,255,255,.1)"/>
+<text x="58" y="19" font-size="11" fill="rgba(255,255,255,.9)" font-family="-apple-system,sans-serif" font-weight="700">her_username</text>
+<text x="58" y="32" font-size="9" fill="rgba(255,255,255,.4)" font-family="-apple-system,sans-serif">Active now</text>
+<line x1="0" y1="44" x2="400" y2="44" stroke="rgba(255,255,255,.07)" stroke-width=".8"/>
+<!-- stage label -->
+<text x="20" y="66" font-size="9" fill="rgba(221,42,123,.7)" font-family="-apple-system,monospace" letter-spacing="1.5">STORY REPLY → DM OPEN</text>
+<!-- story reply tag -->
+<rect x="20" y="72" width="220" height="22" rx="6" fill="rgba(221,42,123,.1)" stroke="rgba(221,42,123,.22)" stroke-width=".8"/>
+<text x="30" y="87" font-size="10" fill="rgba(255,255,255,.5)" font-family="-apple-system,sans-serif">↩ Replied to your story</text>
+<!-- THEM bubble -->
+<rect x="20" y="102" width="190" height="30" rx="12" fill="rgba(255,255,255,.09)" stroke="rgba(255,255,255,.12)" stroke-width=".8"/>
+<text x="34" y="122" font-size="12" fill="rgba(255,255,255,.88)" font-family="-apple-system,sans-serif">omg stop that's literally me</text>
+<!-- YOU — DM opener -->
+<rect x="20" y="142" width="230" height="30" rx="12" fill="url(#ig_msg)"/>
+<text x="34" y="162" font-size="12" fill="#fff" font-family="-apple-system,sans-serif" font-weight="600">you definitely knew I'd see that 😏</text>
+<!-- THEM response -->
+<rect x="20" y="182" width="176" height="30" rx="12" fill="rgba(255,255,255,.09)" stroke="rgba(255,255,255,.12)" stroke-width=".8"/>
+<text x="34" y="202" font-size="12" fill="rgba(255,255,255,.88)" font-family="-apple-system,sans-serif">maybe... 👀 who's asking</text>
+<!-- YOU escalate -->
+<rect x="20" y="222" width="240" height="30" rx="12" fill="url(#ig_msg)" opacity=".9"/>
+<text x="34" y="242" font-size="12" fill="#fff" font-family="-apple-system,sans-serif" font-weight="600">someone who wants to find out more 🔒</text>
+<!-- right panel -->
+<rect x="294" y="50" width="94" height="196" rx="8" fill="rgba(221,42,123,.05)" stroke="rgba(221,42,123,.14)" stroke-width=".7"/>
+<text x="341" y="70" text-anchor="middle" font-size="8" fill="rgba(221,42,123,.6)" font-family="-apple-system,monospace" letter-spacing="1" font-weight="700">STAGES</text>
+<line x1="302" y1="76" x2="380" y2="76" stroke="rgba(221,42,123,.1)" stroke-width=".5"/>
+<text x="304" y="94" font-size="9" fill="rgba(255,255,255,.35)" font-family="-apple-system,sans-serif">Story reply ↗</text>
+<line x1="304" y1="100" x2="380" y2="100" stroke="rgba(255,255,255,.05)" stroke-width=".5"/>
+<text x="304" y="116" font-size="9" fill="rgba(255,255,255,.35)" font-family="-apple-system,sans-serif">DM open 💬</text>
+<line x1="304" y1="122" x2="380" y2="122" stroke="rgba(255,255,255,.05)" stroke-width=".5"/>
+<text x="304" y="138" font-size="9" fill="rgba(255,255,255,.35)" font-family="-apple-system,sans-serif">Investment 🎯</text>
+<line x1="304" y1="144" x2="380" y2="144" stroke="rgba(255,255,255,.05)" stroke-width=".5"/>
+<text x="304" y="160" font-size="9" fill="rgba(255,255,255,.35)" font-family="-apple-system,sans-serif">Number close 📱</text>
+<line x1="304" y1="166" x2="380" y2="166" stroke="rgba(255,255,255,.05)" stroke-width=".5"/>
+<text x="304" y="182" font-size="9" fill="rgba(255,255,255,.35)" font-family="-apple-system,sans-serif">Private ask 🔒</text>
+<line x1="304" y1="188" x2="380" y2="188" stroke="rgba(255,255,255,.05)" stroke-width=".5"/>
+<text x="304" y="204" font-size="9" fill="rgba(221,42,123,.6)" font-family="-apple-system,sans-serif" font-weight="700">WIN ✓</text>
+</svg></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Instagram</p><h3 class="ttitle">IG: From DM to Private</h3></article>
+      <article class="tile" tabindex="0" role="button" aria-label="Tinder Match to Win — locked"><i class="art" style="position:absolute;inset:0;overflow:hidden"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;display:block">
+<defs>
+  <linearGradient id="t_bg" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#FF4458" stop-opacity=".2"/><stop offset="70%" stop-color="#FF4458" stop-opacity="0"/></linearGradient>
+  <linearGradient id="t_fire" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#FF4458"/><stop offset="100%" stop-color="#FF7043"/></linearGradient>
+  <linearGradient id="t_you" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#FF4458"/><stop offset="100%" stop-color="#FF6B35"/></linearGradient>
+</defs>
+<rect width="400" height="300" fill="#0c0506"/>
+<rect width="400" height="300" fill="url(#t_bg)"/>
+<!-- MATCH banner top -->
+<rect x="0" y="0" width="400" height="52" fill="rgba(255,68,88,.1)"/>
+<text x="200" y="22" text-anchor="middle" font-size="10" fill="rgba(255,68,88,.6)" font-family="-apple-system,sans-serif" letter-spacing="3" font-weight="600">⚡ IT'S A MATCH</text>
+<text x="200" y="38" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.4)" font-family="-apple-system,sans-serif">You and Sofia both liked each other</text>
+<line x1="0" y1="52" x2="400" y2="52" stroke="rgba(255,68,88,.18)" stroke-width=".8"/>
+<!-- opener label -->
+<text x="20" y="74" font-size="9" fill="rgba(255,68,88,.6)" font-family="-apple-system,monospace" letter-spacing="1.5">HIGH-RESPONSE OPENER</text>
+<!-- YOU bubble -->
+<rect x="130" y="82" width="250" height="38" rx="10" fill="url(#t_you)"/>
+<text x="145" y="98" font-size="12" fill="#fff" font-family="-apple-system,sans-serif" font-weight="600">okay your dog is literally the</text>
+<text x="145" y="113" font-size="12" fill="#fff" font-family="-apple-system,sans-serif" font-weight="600">reason I swiped right 🐕</text>
+<!-- THEM -->
+<rect x="20" y="130" width="200" height="30" rx="10" fill="rgba(255,255,255,.09)" stroke="rgba(255,255,255,.12)" stroke-width=".8"/>
+<text x="34" y="150" font-size="12" fill="rgba(255,255,255,.88)" font-family="-apple-system,sans-serif">LMAOOO he says hi 😭❤️</text>
+<!-- YOU pivot -->
+<rect x="100" y="170" width="280" height="30" rx="10" fill="url(#t_you)" opacity=".85"/>
+<text x="115" y="190" font-size="12" fill="#fff" font-family="-apple-system,sans-serif" font-weight="600">tell him I'm coming to steal him 👀</text>
+<!-- THEM response — positive -->
+<rect x="20" y="210" width="230" height="30" rx="10" fill="rgba(255,255,255,.09)" stroke="rgba(255,68,88,.22)" stroke-width=".8"/>
+<text x="34" y="230" font-size="12" fill="rgba(255,255,255,.88)" font-family="-apple-system,sans-serif">haha only if you take me too 😘</text>
+<!-- number label -->
+<text x="20" y="268" font-size="9" fill="rgba(255,68,88,.5)" font-family="-apple-system,monospace" letter-spacing="1">↑ GETS NUMBER IN 3 MESSAGES</text>
+<!-- stat badges -->
+<rect x="260" y="212" width="120" height="62" rx="8" fill="rgba(255,68,88,.06)" stroke="rgba(255,68,88,.15)" stroke-width=".7"/>
+<text x="320" y="234" text-anchor="middle" font-size="19" fill="rgba(255,68,88,.8)" font-family="-apple-system,sans-serif" font-weight="800">73%</text>
+<text x="320" y="248" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.35)" font-family="-apple-system,sans-serif">reply rate</text>
+<text x="320" y="262" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.25)" font-family="-apple-system,sans-serif">on this opener</text>
+</svg></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Tinder</p><h3 class="ttitle">Tinder: Match to Win</h3></article>
+      <article class="tile" tabindex="0" role="button" aria-label="Getting Her There — locked"><i class="art" style="position:absolute;inset:0;overflow:hidden"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;display:block">
+<defs>
+  <linearGradient id="e_bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8B78FF" stop-opacity=".0"/><stop offset="100%" stop-color="#6E56F8" stop-opacity=".18"/></linearGradient>
+  <linearGradient id="e_bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#6E56F8"/><stop offset="100%" stop-color="#C84B8C"/></linearGradient>
+  <linearGradient id="e_hot" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#C84B8C"/><stop offset="100%" stop-color="#8B78FF"/></linearGradient>
+  <linearGradient id="e_mid" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#6E56F8"/><stop offset="100%" stop-color="#9A4AC8"/></linearGradient>
+</defs>
+<rect width="400" height="300" fill="#08060f"/>
+<rect width="400" height="300" fill="url(#e_bg)"/>
+<!-- header -->
+<rect x="0" y="0" width="400" height="44" fill="rgba(110,86,248,.08)"/>
+<text x="20" y="27" font-size="11" fill="rgba(139,120,255,.9)" font-family="-apple-system,sans-serif" font-weight="700" letter-spacing="1">ESCALATION FRAMEWORK</text>
+<line x1="0" y1="44" x2="400" y2="44" stroke="rgba(110,86,248,.14)" stroke-width=".8"/>
+<!-- 5 escalation stages as rows -->
+<!-- Stage 1: Opening -->
+<rect x="20" y="54" width="360" height="40" rx="8" fill="rgba(110,86,248,.06)" stroke="rgba(110,86,248,.14)" stroke-width=".8"/>
+<rect x="20" y="54" width="4" height="40" rx="2" fill="rgba(110,86,248,.5)"/>
+<text x="34" y="70" font-size="10" fill="rgba(110,86,248,.7)" font-family="-apple-system,monospace" letter-spacing="1" font-weight="700">STAGE 1 — HOOK</text>
+<text x="34" y="85" font-size="11" fill="rgba(255,255,255,.55)" font-family="-apple-system,sans-serif">"you looked way too comfortable in that pic 👀"</text>
+<!-- Stage 2: Invest -->
+<rect x="20" y="102" width="360" height="40" rx="8" fill="rgba(110,86,248,.08)" stroke="rgba(110,86,248,.18)" stroke-width=".8"/>
+<rect x="20" y="102" width="4" height="40" rx="2" fill="rgba(139,120,255,.6)"/>
+<text x="34" y="118" font-size="10" fill="rgba(139,120,255,.75)" font-family="-apple-system,monospace" letter-spacing="1" font-weight="700">STAGE 2 — PULL</text>
+<text x="34" y="133" font-size="11" fill="rgba(255,255,255,.6)" font-family="-apple-system,sans-serif">"tell me something you wouldn't post on your main"</text>
+<!-- Stage 3: Heat -->
+<rect x="20" y="150" width="360" height="40" rx="8" fill="rgba(154,74,200,.1)" stroke="rgba(154,74,200,.22)" stroke-width=".8"/>
+<rect x="20" y="150" width="4" height="40" rx="2" fill="url(#e_mid)"/>
+<text x="34" y="166" font-size="10" fill="rgba(192,132,252,.8)" font-family="-apple-system,monospace" letter-spacing="1" font-weight="700">STAGE 3 — TENSION</text>
+<text x="34" y="181" font-size="11" fill="rgba(255,255,255,.65)" font-family="-apple-system,sans-serif">"you're actually dangerous to talk to this late 🌙"</text>
+<!-- Stage 4: The turn -->
+<rect x="20" y="198" width="360" height="40" rx="8" fill="rgba(200,75,140,.12)" stroke="rgba(200,75,140,.28)" stroke-width=".9"/>
+<rect x="20" y="198" width="4" height="40" rx="2" fill="url(#e_hot)"/>
+<text x="34" y="214" font-size="10" fill="rgba(200,75,140,.9)" font-family="-apple-system,monospace" letter-spacing="1" font-weight="700">STAGE 4 — THE TURN</text>
+<text x="34" y="229" font-size="11" fill="rgba(255,255,255,.75)" font-family="-apple-system,sans-serif">"I want to see what you actually look like when you're—"</text>
+<!-- heat meter bottom -->
+<rect x="20" y="248" width="360" height="6" rx="3" fill="rgba(255,255,255,.06)"/>
+<rect x="20" y="248" width="270" height="6" rx="3" fill="url(#e_bar)" opacity=".8"/>
+<text x="20" y="272" font-size="9" fill="rgba(110,86,248,.45)" font-family="-apple-system,monospace">COLD</text>
+<text x="200" y="272" text-anchor="middle" font-size="9" fill="rgba(154,74,200,.55)" font-family="-apple-system,monospace">WARM</text>
+<text x="380" y="272" text-anchor="end" font-size="9" fill="rgba(200,75,140,.65)" font-family="-apple-system,monospace">HOT</text>
+<text x="296" y="264" text-anchor="middle" font-size="8" fill="rgba(200,75,140,.7)" font-family="-apple-system,monospace">← you are here</text>
+</svg></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Escalation</p><h3 class="ttitle">Getting Her There</h3></article>
+      <article class="tile" tabindex="0" role="button" aria-label="When & How to Ask — locked"><i class="art" style="position:absolute;inset:0;overflow:hidden"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;display:block">
+<defs>
+  <linearGradient id="a_bg" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#C84B8C" stop-opacity=".16"/><stop offset="100%" stop-color="#6E56F8" stop-opacity=".08"/></linearGradient>
+  <linearGradient id="a_btn" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#C84B8C"/><stop offset="100%" stop-color="#8B78FF"/></linearGradient>
+  <linearGradient id="a_pu" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#6E56F8"/><stop offset="100%" stop-color="#9A4AC8"/></linearGradient>
+</defs>
+<rect width="400" height="300" fill="#0c0410"/>
+<rect width="400" height="300" fill="url(#a_bg)"/>
+<!-- header -->
+<rect x="0" y="0" width="400" height="44" fill="rgba(200,75,140,.08)"/>
+<text x="20" y="27" font-size="11" fill="rgba(200,75,140,.9)" font-family="-apple-system,sans-serif" font-weight="700" letter-spacing="1">WHEN &amp; HOW TO ASK</text>
+<line x1="0" y1="44" x2="400" y2="44" stroke="rgba(200,75,140,.14)" stroke-width=".8"/>
+<!-- timing checklist -->
+<text x="20" y="66" font-size="9" fill="rgba(200,75,140,.55)" font-family="-apple-system,monospace" letter-spacing="1.5">GREEN LIGHT SIGNALS</text>
+<rect x="20" y="72" width="168" height="24" rx="6" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.09)" stroke-width=".7"/>
+<text x="34" y="88" font-size="11" fill="rgba(255,255,255,.75)" font-family="-apple-system,sans-serif">✓  She's asking questions</text>
+<rect x="20" y="102" width="168" height="24" rx="6" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.09)" stroke-width=".7"/>
+<text x="34" y="118" font-size="11" fill="rgba(255,255,255,.75)" font-family="-apple-system,sans-serif">✓  Replies within minutes</text>
+<rect x="20" y="132" width="168" height="24" rx="6" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.09)" stroke-width=".7"/>
+<text x="34" y="148" font-size="11" fill="rgba(255,255,255,.75)" font-family="-apple-system,sans-serif">✓  Sent you something first</text>
+<rect x="20" y="162" width="168" height="24" rx="6" fill="rgba(200,75,140,.12)" stroke="rgba(200,75,140,.28)" stroke-width=".8"/>
+<text x="34" y="178" font-size="11" fill="rgba(255,255,255,.85)" font-family="-apple-system,sans-serif">✓  You've built tension</text>
+<!-- THE script right side -->
+<rect x="206" y="56" width="174" height="190" rx="8" fill="rgba(200,75,140,.06)" stroke="rgba(200,75,140,.18)" stroke-width=".8"/>
+<text x="293" y="76" text-anchor="middle" font-size="9" fill="rgba(200,75,140,.65)" font-family="-apple-system,monospace" letter-spacing="1" font-weight="700">THE ASK SCRIPTS</text>
+<line x1="214" y1="82" x2="372" y2="82" stroke="rgba(200,75,140,.1)" stroke-width=".5"/>
+<text x="218" y="98" font-size="10" fill="rgba(255,255,255,.55)" font-family="-apple-system,sans-serif">Soft ask:</text>
+<rect x="216" y="102" width="156" height="28" rx="6" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)" stroke-width=".6"/>
+<text x="224" y="115" font-size="10" fill="rgba(255,255,255,.72)" font-family="-apple-system,sans-serif" font-style="italic">"I feel like I'd learn a</text>
+<text x="224" y="127" font-size="10" fill="rgba(255,255,255,.72)" font-family="-apple-system,sans-serif" font-style="italic">lot from you on FT 👀"</text>
+<text x="218" y="148" font-size="10" fill="rgba(200,75,140,.7)" font-family="-apple-system,sans-serif">Direct ask:</text>
+<rect x="216" y="152" width="156" height="28" rx="6" fill="rgba(200,75,140,.08)" stroke="rgba(200,75,140,.2)" stroke-width=".6"/>
+<text x="224" y="165" font-size="10" fill="rgba(255,255,255,.8)" font-family="-apple-system,sans-serif" font-style="italic">"send me something</text>
+<text x="224" y="177" font-size="10" fill="rgba(255,255,255,.8)" font-family="-apple-system,sans-serif" font-style="italic">worth looking at later"</text>
+<text x="218" y="198" font-size="10" fill="rgba(139,120,255,.7)" font-family="-apple-system,sans-serif">Bold ask:</text>
+<rect x="216" y="202" width="156" height="28" rx="6" fill="rgba(110,86,248,.1)" stroke="rgba(110,86,248,.22)" stroke-width=".7"/>
+<text x="224" y="215" font-size="10" fill="rgba(255,255,255,.85)" font-family="-apple-system,sans-serif" font-style="italic">"you know exactly what</text>
+<text x="224" y="227" font-size="10" fill="rgba(255,255,255,.85)" font-family="-apple-system,sans-serif" font-style="italic">I want to see 🔒"</text>
+<!-- bottom message -->
+<rect x="20" y="196" width="168" height="50" rx="8" fill="url(#a_btn)" opacity=".18" stroke="url(#a_btn)" stroke-width=".8" stroke-opacity=".4"/>
+<text x="104" y="215" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.65)" font-family="-apple-system,sans-serif">Exact timing map +</text>
+<text x="104" y="229" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.65)" font-family="-apple-system,sans-serif">recovery scripts inside</text>
+<text x="104" y="243" text-anchor="middle" font-size="9" fill="rgba(200,75,140,.6)" font-family="-apple-system,sans-serif">for when she says "maybe" →</text>
+</svg></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">The Ask</p><h3 class="ttitle">When &amp; How to Ask</h3></article>
+      <article class="tile" tabindex="0" role="button" aria-label="Real Thread Breakdowns — locked"><i class="art" style="position:absolute;inset:0;overflow:hidden"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;display:block">
+<defs>
+  <linearGradient id="b_bg" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#0EA5E9" stop-opacity=".12"/><stop offset="70%" stop-color="#6E56F8" stop-opacity=".06"/><stop offset="100%" stop-color="#6E56F8" stop-opacity="0"/></linearGradient>
+  <linearGradient id="b_pu" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#6E56F8"/><stop offset="100%" stop-color="#8B78FF"/></linearGradient>
+  <linearGradient id="b_tl" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#0EA5E9"/><stop offset="100%" stop-color="#38BDF8"/></linearGradient>
+</defs>
+<rect width="400" height="300" fill="#05070e"/>
+<rect width="400" height="300" fill="url(#b_bg)"/>
+<!-- header bar -->
+<rect x="0" y="0" width="400" height="44" fill="rgba(14,165,233,.07)"/>
+<text x="20" y="27" font-size="11" fill="rgba(14,165,233,.85)" font-family="-apple-system,monospace" font-weight="700" letter-spacing="1.5">THREAD BREAKDOWN #14</text>
+<rect x="310" y="12" width="72" height="20" rx="10" fill="rgba(14,165,233,.12)" stroke="rgba(14,165,233,.25)" stroke-width=".8"/>
+<text x="346" y="26" text-anchor="middle" font-size="9" fill="rgba(14,165,233,.8)" font-family="-apple-system,monospace" font-weight="600">REAL WIN</text>
+<line x1="0" y1="44" x2="400" y2="44" stroke="rgba(14,165,233,.12)" stroke-width=".8"/>
+<!-- annotated messages left side -->
+<!-- msg 1 — opener -->
+<rect x="20" y="54" width="192" height="28" rx="10" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.1)" stroke-width=".8"/>
+<text x="34" y="73" font-size="11" fill="rgba(255,255,255,.75)" font-family="-apple-system,sans-serif">your energy is actually dangerous</text>
+<!-- annotation -->
+<line x1="214" y1="68" x2="242" y2="68" stroke="rgba(14,165,233,.55)" stroke-width="1" stroke-dasharray="3,3"/>
+<rect x="244" y="56" width="134" height="22" rx="5" fill="rgba(14,165,233,.08)" stroke="rgba(14,165,233,.25)" stroke-width=".7"/>
+<text x="252" y="71" font-size="10" fill="rgba(14,165,233,.8)" font-family="-apple-system,monospace" font-weight="600">HOOK — mystery frame</text>
+<!-- msg 2 — her reply -->
+<rect x="20" y="92" width="154" height="28" rx="10" fill="url(#b_pu)" opacity=".65"/>
+<text x="34" y="111" font-size="11" fill="#fff" font-family="-apple-system,sans-serif">dangerous how 😳</text>
+<line x1="176" y1="106" x2="242" y2="106" stroke="rgba(110,86,248,.55)" stroke-width="1" stroke-dasharray="3,3"/>
+<rect x="244" y="94" width="134" height="22" rx="5" fill="rgba(110,86,248,.08)" stroke="rgba(110,86,248,.25)" stroke-width=".7"/>
+<text x="252" y="109" font-size="10" fill="rgba(139,120,255,.8)" font-family="-apple-system,monospace" font-weight="600">HER INVEST — she asked</text>
+<!-- msg 3 -->
+<rect x="20" y="130" width="210" height="28" rx="10" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.1)" stroke-width=".8"/>
+<text x="34" y="149" font-size="11" fill="rgba(255,255,255,.75)" font-family="-apple-system,sans-serif">the kind that makes you not sleep</text>
+<line x1="232" y1="144" x2="242" y2="144" stroke="rgba(14,165,233,.45)" stroke-width="1" stroke-dasharray="3,3"/>
+<rect x="244" y="132" width="134" height="22" rx="5" fill="rgba(14,165,233,.06)" stroke="rgba(14,165,233,.2)" stroke-width=".7"/>
+<text x="252" y="147" font-size="10" fill="rgba(14,165,233,.7)" font-family="-apple-system,monospace" font-weight="600">TENSION HELD — no over-explain</text>
+<!-- msg 4 — THE move, highlighted -->
+<rect x="18" y="168" width="214" height="32" rx="12" fill="url(#b_pu)" opacity=".9"/>
+<rect x="14" y="164" width="222" height="40" rx="14" fill="none" stroke="url(#b_pu)" stroke-width="1.2" opacity=".5"/>
+<text x="32" y="185" font-size="11" fill="#fff" font-family="-apple-system,sans-serif" font-weight="700">"I need to see what you actually</text>
+<text x="32" y="198" font-size="11" fill="#fff" font-family="-apple-system,sans-serif" font-weight="700">look like when you let go 🔒"</text>
+<line x1="238" y1="184" x2="242" y2="184" stroke="rgba(200,75,140,.8)" stroke-width="1.3" stroke-dasharray="3,3"/>
+<rect x="244" y="170" width="134" height="32" rx="5" fill="rgba(200,75,140,.12)" stroke="rgba(200,75,140,.4)" stroke-width=".9"/>
+<text x="252" y="183" font-size="10" fill="rgba(200,75,140,.95)" font-family="-apple-system,monospace" font-weight="700">THE MOVE ★</text>
+<text x="252" y="196" font-size="9" fill="rgba(200,75,140,.65)" font-family="-apple-system,monospace">breakdown inside →</text>
+<!-- result -->
+<rect x="20" y="212" width="360" height="36" rx="8" fill="rgba(14,165,233,.06)" stroke="rgba(14,165,233,.18)" stroke-width=".8"/>
+<text x="200" y="228" text-anchor="middle" font-size="10" fill="rgba(14,165,233,.7)" font-family="-apple-system,monospace" letter-spacing="1">RESULT</text>
+<text x="200" y="242" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.65)" font-family="-apple-system,sans-serif">She sent first. 14 minutes later. 🔥</text>
+<!-- bottom bar -->
+<text x="20" y="276" font-size="9" fill="rgba(255,255,255,.22)" font-family="-apple-system,monospace">32 real breakdowns · what worked · what didn't · why</text>
+</svg></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Breakdowns</p><h3 class="ttitle">Real Thread Breakdowns</h3></article>
+    </div>
+  </div>
+</section>
+<section class="section" id="reviews">
+  <div class="wrap">
+    <div class="sec-head reveal"><p class="eyebrow">What they said</p><h2>Results speak.</h2></div>
+    <div class="reviews-grid reveal" style="--d:.08s">
+      <article class="review"><p class="review-text">"Tinder was basically dead for me. Used the playbook for a week and had girls sending me stuff I never expected. The platform breakdowns are insane."</p><p class="review-name">— Marcus D., 19</p></article>
+      <article class="review"><p class="review-text">"Snap is a different game once you know what you're doing. Got my first real win within 3 days. The escalation section is what does it."</p><p class="review-name">— Jake M., 20</p></article>
+      <article class="review"><p class="review-text">"I've tried everything. This is the only thing that actually moves conversations to where you want them to go. IG specifically is locked in."</p><p class="review-name">— Tyler R., 21</p></article>
+      <article class="review"><p class="review-text">"Didn't think Hinge could go there but the guide changed that. Girls I matched with months ago started sending. Worth every dollar."</p><p class="review-name">— Ryan K., 22</p></article>
     </div>
   </div>
 </section>
@@ -832,7 +1115,7 @@ p{margin:0}
 
     document.getElementById('bmCTA').addEventListener('click', function() {
       closeBuyModal();
-      // !! winonany.com buttons MUST go to winonany.win — never use relative /pay here
+      // winonany.com buttons MUST go to winonany.win — never relative /pay
       window.location.href = 'https://winonany.win/pay?tier=' + activeTier;
     });
     document.getElementById('bmLater').addEventListener('click', closeBuyModal);
