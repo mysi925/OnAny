@@ -11,7 +11,7 @@ const { paymentsApi } = client;
 const VALID_TIERS = new Set(['access', 'system', 'control']);
 
 router.post('/charge', async (req, res) => {
-  const { sourceId, tier, email } = req.body;
+  const { sourceId, tier, email, promoCode } = req.body;
 
   if (!sourceId || typeof sourceId !== 'string') {
     return res.status(400).json({ error: 'Missing sourceId.' });
@@ -20,7 +20,12 @@ router.post('/charge', async (req, res) => {
     return res.status(400).json({ error: 'Invalid tier.' });
   }
 
-  const price = PRODUCT_PRICES[tier];
+  const PROMO_DISCOUNTS = { WIN: 0.85 };
+  let price = PRODUCT_PRICES[tier];
+  if (promoCode && typeof promoCode === 'string') {
+    const mult = PROMO_DISCOUNTS[promoCode.toUpperCase()];
+    if (mult) price = Math.round(price * mult);
+  }
   const label = PRODUCT_LABELS[tier];
 
   try {
