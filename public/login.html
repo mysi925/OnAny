@@ -61,21 +61,50 @@ h1{font-size:clamp(22px,5vw,30px);font-weight:800;letter-spacing:-.04em;margin-b
   </div>
 </div>
 <script>
-document.getElementById('loginForm').addEventListener('submit', function(e){
+document.getElementById('loginForm').addEventListener('submit', function(e) {
   e.preventDefault();
   var email = document.getElementById('email').value.trim();
   var pass  = document.getElementById('password').value;
   var btn   = document.getElementById('loginBtn');
   var msg   = document.getElementById('loginMsg');
-  if(!email || !pass){ msg.textContent='Email and password required.'; msg.className='msg err'; return; }
-  btn.disabled = true; btn.textContent = 'Logging in…'; msg.className='msg';
-  fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,password:pass})})
-  .then(function(r){return r.json();})
-  .then(function(d){
-    if(d.ok){ window.location.href='/portal'; }
-    else{ msg.textContent=d.error||'Login failed.'; msg.className='msg err'; btn.disabled=false; btn.textContent='Log in →'; }
+
+  if (!email || !pass) {
+    msg.textContent = 'Email and password required.';
+    msg.className   = 'msg err';
+    return;
+  }
+
+  btn.disabled    = true;
+  btn.textContent = 'Logging in…';
+  msg.className   = 'msg';
+
+  fetch('/api/auth/login', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ email: email, password: pass })
   })
-  .catch(function(){ msg.textContent='Connection error. Try again.'; msg.className='msg err'; btn.disabled=false; btn.textContent='Log in →'; });
+  .then(function(r) {
+    return r.json().then(function(d) { return { ok: r.ok, d: d }; });
+  })
+  .then(function(res) {
+    if (res.ok && res.d.token) {
+      // FIX: was checking d.ok (always undefined) — now checks r.ok + token presence
+      localStorage.setItem('woa_token', res.d.token);
+      var next = new URLSearchParams(window.location.search).get('next') || '/portal';
+      window.location.href = next;
+    } else {
+      msg.textContent = res.d.error || 'Login failed.';
+      msg.className   = 'msg err';
+      btn.disabled    = false;
+      btn.textContent = 'Log in →';
+    }
+  })
+  .catch(function() {
+    msg.textContent = 'Connection error. Try again.';
+    msg.className   = 'msg err';
+    btn.disabled    = false;
+    btn.textContent = 'Log in →';
+  });
 });
 </script>
 </body>
