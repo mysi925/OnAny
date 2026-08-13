@@ -1,10 +1,5 @@
 'use strict';
 
-// ── FIXED: routes are registered WITHOUT the /api prefix ─────────────────────
-// server.js mounts this router at app.use('/api', authRoute), so:
-//   router.get('/auth/me', ...)    → resolves to GET /api/auth/me  ✓
-//   router.get('/api/auth/me', ...)→ resolves to GET /api/api/auth/me  ✗ (was the bug)
-
 const express = require('express');
 const jwt     = require('jsonwebtoken');
 const bcrypt  = require('bcryptjs');
@@ -36,18 +31,23 @@ function requireAuth(req, res, next) {
 router.post('/auth/register', async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ error: 'Email and password required.' });
+    if (!email || !password)
+      return res.status(400).json({ error: 'Email and password required.' });
 
-    const hash   = await bcrypt.hash(password, 12);
+    const hash = await bcrypt.hash(password, 12);
+
+    // FIX: removed tier='none' from INSERT — the column is now nullable (no DEFAULT).
+    // Inserting 'none' caused a CHECK constraint violation (23514) and crashed every registration.
     const result = await pool.query(
-      `INSERT INTO users (email, password_hash, tier)
-       VALUES ($1, $2, 'none')
+      `INSERT INTO users (email, password_hash)
+       VALUES ($1, $2)
        ON CONFLICT (email) DO NOTHING
        RETURNING id, email, tier`,
       [email.toLowerCase().trim(), hash]
     );
 
-    if (result.rowCount === 0) return res.status(409).json({ error: 'Email already registered.' });
+    if (result.rowCount === 0)
+      return res.status(409).json({ error: 'Email already registered.' });
 
     const user = result.rows[0];
     return res.status(201).json({ token: issueToken(user), tier: user.tier });
@@ -61,7 +61,8 @@ router.post('/auth/register', async (req, res) => {
 router.post('/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ error: 'Email and password required.' });
+    if (!email || !password)
+      return res.status(400).json({ error: 'Email and password required.' });
 
     const result = await pool.query(
       'SELECT id, email, password_hash, tier FROM users WHERE email = $1',
@@ -81,7 +82,7 @@ router.post('/auth/login', async (req, res) => {
   }
 });
 
-// GET /api/auth/me  ← was /api/api/auth/me before fix
+// GET /api/auth/me
 router.get('/auth/me', requireAuth, async (req, res) => {
   try {
     const result = await pool.query(
@@ -97,7 +98,7 @@ router.get('/auth/me', requireAuth, async (req, res) => {
   }
 });
 
-// POST /api/auth/logout  (client-side token removal; server just confirms)
+// POST /api/auth/logout
 router.post('/auth/logout', (req, res) => {
   return res.json({ success: true });
 });
