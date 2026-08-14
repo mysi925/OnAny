@@ -235,6 +235,222 @@ p{margin:0}
 .promo-cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:52px;background:var(--accent);color:#fff;font-size:15px;font-weight:700;letter-spacing:.01em;border:0;transition:.35s var(--ease);cursor:pointer}
 .promo-cta:hover{background:var(--accent-lift);box-shadow:0 14px 46px -14px rgba(110,86,248,.85)}
 .promo-cta:active{transform:scale(.97)}
+
+/* ══════════════════════════════════════════
+   BUY MODAL — replaces /pay redirect
+   ══════════════════════════════════════════ */
+#buyOverlay{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(5,5,7,.82);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+  opacity:0;pointer-events:none;
+  transition:opacity .38s cubic-bezier(.16,1,.3,1);
+}
+#buyOverlay.show{opacity:1;pointer-events:auto}
+#buyModal{
+  background:var(--panel);
+  border:1px solid rgba(110,86,248,.38);
+  box-shadow:0 0 0 1px rgba(110,86,248,.10),0 32px 80px -24px rgba(110,86,248,.45),0 0 120px -40px rgba(110,86,248,.22);
+  max-width:500px;width:100%;
+  position:relative;
+  overflow:hidden;
+  max-height:calc(100dvh - 32px);
+  overflow-y:auto;
+}
+#buyModal::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent) 35%,var(--accent-lift) 65%,transparent);
+}
+@keyframes buyIn{
+  from{opacity:0;transform:translateY(22px) scale(.96)}
+  to{opacity:1;transform:none}
+}
+#buyOverlay.show #buyModal{animation:buyIn .42s cubic-bezier(.16,1,.3,1) both}
+
+.bm-close{
+  position:absolute;top:14px;right:16px;
+  width:32px;height:32px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted-2);font-size:22px;line-height:1;
+  z-index:1;transition:color .2s;cursor:pointer;
+  background:none;border:0;
+}
+.bm-close:hover{color:var(--text)}
+
+/* thumb — abstract art area */
+.bm-thumb{
+  position:relative;height:140px;overflow:hidden;
+  background:radial-gradient(ellipse 80% 140% at 50% 110%,rgba(110,86,248,.32),rgba(5,5,7,0) 68%);
+  border-bottom:1px solid rgba(255,255,255,.055);
+  display:flex;align-items:center;justify-content:center;
+}
+.bm-thumb-art{
+  width:100%;height:100%;position:absolute;inset:0;
+  background-image:
+    radial-gradient(ellipse 60% 80% at 30% 60%, rgba(110,86,248,.22), transparent 58%),
+    radial-gradient(ellipse 50% 70% at 70% 40%, rgba(139,120,255,.16), transparent 52%),
+    linear-gradient(180deg,rgba(5,5,7,0) 40%,var(--panel) 100%);
+}
+/* floating chat bubbles in the thumb */
+.bm-bubbles{position:absolute;inset:0;pointer-events:none}
+.bm-bub{
+  position:absolute;
+  padding:8px 14px;
+  font-size:12.5px;
+  font-family:var(--display);
+  line-height:1.3;
+  filter:blur(1.5px);
+  opacity:.55;
+}
+.bm-bub.r{
+  background:linear-gradient(122deg,var(--accent),#9A4AC8);
+  color:#fff;right:22px;
+}
+.bm-bub.l{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.10);
+  color:#E4E4EC;left:22px;
+}
+.bm-bub:nth-child(1){top:22px}
+.bm-bub:nth-child(2){top:58px}
+.bm-bub:nth-child(3){top:96px}
+
+/* lock icon in thumb */
+.bm-vault-icon{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+.bm-vault-icon svg{
+  filter:drop-shadow(0 0 18px rgba(110,86,248,.7));
+  opacity:.92;
+}
+.bm-vault-label{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--accent-lift);opacity:.8;
+}
+
+/* body */
+.bm-body{padding:28px 28px 24px}
+@media(max-width:480px){.bm-body{padding:22px 20px 20px}}
+
+.bm-tag{
+  font-family:var(--mono);font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--accent-lift);margin-bottom:10px;
+}
+.bm-title{
+  font-size:clamp(20px,4.5vw,26px);font-weight:800;
+  letter-spacing:-.045em;line-height:1.08;
+  margin:0 0 10px;
+}
+.bm-sub{
+  color:var(--muted);font-size:14px;line-height:1.55;
+  margin:0 0 18px;
+}
+.bm-bullets{
+  list-style:none;margin:0 0 22px;padding:0;
+  display:flex;flex-direction:column;gap:8px;
+}
+.bm-bullets li{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:13.5px;color:#CFCFD6;line-height:1.4;
+}
+.bm-bullets li::before{
+  content:"";flex:0 0 5px;height:5px;
+  background:var(--accent);margin-top:7px;
+}
+.bm-social{
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted-2);
+  margin-bottom:18px;
+  display:flex;align-items:center;gap:7px;
+}
+.bm-social::before{
+  content:"";width:6px;height:6px;flex:0 0 6px;
+  background:var(--accent);
+  animation:pulse 2.4s ease-in-out infinite;
+}
+.bm-cta{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;min-height:56px;
+  background:var(--accent);color:#fff;
+  font-size:15.5px;font-weight:700;letter-spacing:.01em;
+  border:0;cursor:pointer;
+  transition:.35s cubic-bezier(.16,1,.3,1);
+  position:relative;overflow:hidden;
+}
+.bm-cta::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.13),transparent);
+  transform:translateX(-110%);transition:transform .7s cubic-bezier(.16,1,.3,1);
+}
+.bm-cta:hover{background:var(--accent-lift);box-shadow:0 14px 46px -14px rgba(110,86,248,.9)}
+.bm-cta:hover::after{transform:translateX(110%)}
+.bm-cta:active{transform:scale(.97)}
+.bm-later{
+  display:block;text-align:center;margin-top:14px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted-2);
+  cursor:pointer;background:none;border:0;width:100%;
+  transition:color .25s;
+}
+.bm-later:hover{color:var(--muted)}
+
+/* ══════════════════════════════════════════
+   MOBILE HERO — premium rewrite
+   ══════════════════════════════════════════ */
+@media(max-width:600px){
+  .hero{padding:52px 0 56px}
+  .hero-grid{gap:44px}
+  .hero-grid > div:first-child{
+    text-align:center;
+    display:flex;flex-direction:column;align-items:center;
+  }
+  .eyebrow{font-size:10px;letter-spacing:.16em}
+  .hero h1{
+    font-size:clamp(40px,13vw,58px);
+    margin-top:14px;
+    letter-spacing:-.06em;
+  }
+  .hero-sub{
+    margin-top:14px;
+    font-size:15px;
+    max-width:28ch;
+    text-align:center;
+    margin-inline:auto;
+    color:#B0B0BA;
+  }
+  .hero-cta{
+    flex-direction:column;
+    align-items:stretch;
+    gap:10px;
+    margin-top:26px;
+    width:100%;
+    max-width:340px;
+  }
+  .hero-cta .btn{
+    min-height:56px;
+    font-size:15.5px;
+    border-radius:0;
+    width:100%;
+    justify-content:center;
+  }
+  .hero-meta{
+    justify-content:center;
+    margin-top:20px;
+    font-size:10px;
+    letter-spacing:.09em;
+    text-align:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+}
+
+/* ══════════════════════════════════════════
+   VAULT TILE ART — premium SVG backgrounds
+   ══════════════════════════════════════════ */
+.tile .art{background-size:cover!important;background-position:center!important}
 </style>
 </head>
 <body>
@@ -366,52 +582,6 @@ p{margin:0}
     </div>
   </div>
 </section>
-<section class="section" id="system">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow">The playbook <b>&nbsp;/&nbsp;</b> How it works</p>
-      <h2>Every situation.<br>Covered.</h2>
-      <p class="lead">The exact moments every guy gets stuck in. Scripts and breakdowns for each one — not generic advice.</p>
-    </div>
-    <div class="steps reveal" style="--d:.08s">
-      <article class="step"><p class="num">01</p><h3>Profile Advantage</h3><p class="sdesc">Before you say anything she's already decided. This is how you make sure it goes your way.</p></article>
-      <article class="step"><p class="num">02</p><h3>Opening Vault</h3><p class="sdesc">The first message either opens the door or closes it. Real openers that set the right tone from the start.</p></article>
-      <article class="step"><p class="num">03</p><h3>Conversation Game</h3><p class="sdesc">She's interested but won't move. She went cold after things were going good. She keeps redirecting. Covered.</p></article>
-      <article class="step"><p class="num">04</p><h3>Momentum Control</h3><p class="sdesc">When she's ready. How to ask without killing it. What to say right after she sends. What to do when she stops.</p></article>
-      <article class="step"><p class="num">05</p><h3>Platform Playbooks</h3><p class="sdesc">Same situations play out on every app. The playbook adapts to wherever the conversation is happening.</p></article>
-    </div>
-  </div>
-</section>
-<section class="section" id="vault">
-  <div class="wrap">
-    <div class="sec-head vault-head reveal" style="max-width:none">
-      <div style="display:flex;flex-direction:column;gap:16px;max-width:560px">
-        <p class="eyebrow">The vault <b>&nbsp;/&nbsp;</b> Private archive</p>
-        <h2>The library most<br>people never see.</h2>
-      </div>
-      <p class="lead" style="max-width:36ch">Scripts, breakdowns, and strategies. Locked until you're in.</p>
-    </div>
-    <div class="vault reveal" style="--d:.08s" id="vaultGrid">
-      <article class="tile" tabindex="0" role="button" aria-label="Snap Fast Track — locked"><i class="art" style="background-image:linear-gradient(135deg,#3B2C8F,#0B0B0F 58%),repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 9px)"></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Snapchat</p><h3 class="ttitle">Snap: Fast Track</h3></article>
-      <article class="tile" tabindex="0" role="button" aria-label="IG DM Vault — locked"><i class="art" style="background-image:linear-gradient(200deg,#5A2470,#0B0B0F 60%),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 9px)"></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Instagram</p><h3 class="ttitle">IG: From DM to Private</h3></article>
-      <article class="tile" tabindex="0" role="button" aria-label="Tinder Match to Win — locked"><i class="art" style="background-image:linear-gradient(300deg,#2A3B96,#0B0B0F 58%),repeating-linear-gradient(45deg,rgba(255,255,255,.045) 0 1px,transparent 1px 11px)"></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Tinder</p><h3 class="ttitle">Tinder: Match to Win</h3></article>
-      <article class="tile" tabindex="0" role="button" aria-label="Getting Her There — locked"><i class="art" style="background-image:linear-gradient(160deg,#6E56F8,#0B0B0F 62%),repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 1px,transparent 1px 10px)"></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Escalation</p><h3 class="ttitle">Getting Her There</h3></article>
-      <article class="tile" tabindex="0" role="button" aria-label="When & How to Ask — locked"><i class="art" style="background-image:linear-gradient(20deg,#7A2B4E,#0B0B0F 60%),repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 13px)"></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">The Ask</p><h3 class="ttitle">When &amp; How to Ask</h3></article>
-      <article class="tile" tabindex="0" role="button" aria-label="Real Thread Breakdowns — locked"><i class="art" style="background-image:linear-gradient(240deg,#1F4E8C,#0B0B0F 58%),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 12px)"></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Breakdowns</p><h3 class="ttitle">Real Thread Breakdowns</h3></article>
-    </div>
-  </div>
-</section>
-<section class="section" id="reviews">
-  <div class="wrap">
-    <div class="sec-head reveal"><p class="eyebrow">What they said</p><h2>Results speak.</h2></div>
-    <div class="reviews-grid reveal" style="--d:.08s">
-      <article class="review"><p class="review-text">"Tinder was basically dead for me. Used the playbook for a week and had girls sending me stuff I never expected. The platform breakdowns are insane."</p><p class="review-name">— Marcus D., 19</p></article>
-      <article class="review"><p class="review-text">"Snap is a different game once you know what you're doing. Got my first real win within 3 days. The escalation section is what does it."</p><p class="review-name">— Jake M., 20</p></article>
-      <article class="review"><p class="review-text">"I've tried everything. This is the only thing that actually moves conversations to where you want them to go. IG specifically is locked in."</p><p class="review-name">— Tyler R., 21</p></article>
-      <article class="review"><p class="review-text">"Didn't think Hinge could go there but the guide changed that. Girls I matched with months ago started sending. Worth every dollar."</p><p class="review-name">— Ryan K., 22</p></article>
-    </div>
-  </div>
-</section>
 <section class="section" id="pricing">
   <div class="wrap">
     <div class="sec-head reveal">
@@ -460,6 +630,52 @@ p{margin:0}
     </div>
   </div>
 </section>
+<section class="section" id="system">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow">The playbook <b>&nbsp;/&nbsp;</b> How it works</p>
+      <h2>Every situation.<br>Covered.</h2>
+      <p class="lead">The exact moments every guy gets stuck in. Scripts and breakdowns for each one — not generic advice.</p>
+    </div>
+    <div class="steps reveal" style="--d:.08s">
+      <article class="step"><p class="num">01</p><h3>Profile Advantage</h3><p class="sdesc">Before you say anything she's already decided. This is how you make sure it goes your way.</p></article>
+      <article class="step"><p class="num">02</p><h3>Opening Vault</h3><p class="sdesc">The first message either opens the door or closes it. Real openers that set the right tone from the start.</p></article>
+      <article class="step"><p class="num">03</p><h3>Conversation Game</h3><p class="sdesc">She's interested but won't move. She went cold after things were going good. She keeps redirecting. Covered.</p></article>
+      <article class="step"><p class="num">04</p><h3>Momentum Control</h3><p class="sdesc">When she's ready. How to ask without killing it. What to say right after she sends. What to do when she stops.</p></article>
+      <article class="step"><p class="num">05</p><h3>Platform Playbooks</h3><p class="sdesc">Same situations play out on every app. The playbook adapts to wherever the conversation is happening.</p></article>
+    </div>
+  </div>
+</section>
+<section class="section" id="vault">
+  <div class="wrap">
+    <div class="sec-head vault-head reveal" style="max-width:none">
+      <div style="display:flex;flex-direction:column;gap:16px;max-width:560px">
+        <p class="eyebrow">The vault <b>&nbsp;/&nbsp;</b> Private archive</p>
+        <h2>The library most<br>people never see.</h2>
+      </div>
+      <p class="lead" style="max-width:36ch">Scripts, breakdowns, and strategies. Locked until you're in.</p>
+    </div>
+    <div class="vault reveal" style="--d:.08s" id="vaultGrid">
+      <article class="tile" tabindex="0" role="button" aria-label="Snap Fast Track — locked"><i class="art" style="background-image:linear-gradient(135deg,#3B2C8F,#0B0B0F 58%),repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 9px)"></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Snapchat</p><h3 class="ttitle">Snap: Fast Track</h3></article>
+      <article class="tile" tabindex="0" role="button" aria-label="IG DM Vault — locked"><i class="art" style="background-image:linear-gradient(200deg,#5A2470,#0B0B0F 60%),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 9px)"></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Instagram</p><h3 class="ttitle">IG: From DM to Private</h3></article>
+      <article class="tile" tabindex="0" role="button" aria-label="Tinder Match to Win — locked"><i class="art" style="background-image:linear-gradient(300deg,#2A3B96,#0B0B0F 58%),repeating-linear-gradient(45deg,rgba(255,255,255,.045) 0 1px,transparent 1px 11px)"></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Tinder</p><h3 class="ttitle">Tinder: Match to Win</h3></article>
+      <article class="tile" tabindex="0" role="button" aria-label="Getting Her There — locked"><i class="art" style="background-image:linear-gradient(160deg,#6E56F8,#0B0B0F 62%),repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 1px,transparent 1px 10px)"></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Escalation</p><h3 class="ttitle">Getting Her There</h3></article>
+      <article class="tile" tabindex="0" role="button" aria-label="When & How to Ask — locked"><i class="art" style="background-image:linear-gradient(20deg,#7A2B4E,#0B0B0F 60%),repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 13px)"></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">The Ask</p><h3 class="ttitle">When &amp; How to Ask</h3></article>
+      <article class="tile" tabindex="0" role="button" aria-label="Real Thread Breakdowns — locked"><i class="art" style="background-image:linear-gradient(240deg,#1F4E8C,#0B0B0F 58%),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 12px)"></i><i class="veil"></i><i class="spot"></i><span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Locked</span><p class="cat">Breakdowns</p><h3 class="ttitle">Real Thread Breakdowns</h3></article>
+    </div>
+  </div>
+</section>
+<section class="section" id="reviews">
+  <div class="wrap">
+    <div class="sec-head reveal"><p class="eyebrow">What they said</p><h2>Results speak.</h2></div>
+    <div class="reviews-grid reveal" style="--d:.08s">
+      <article class="review"><p class="review-text">"Tinder was basically dead for me. Used the playbook for a week and had girls sending me stuff I never expected. The platform breakdowns are insane."</p><p class="review-name">— Marcus D., 19</p></article>
+      <article class="review"><p class="review-text">"Snap is a different game once you know what you're doing. Got my first real win within 3 days. The escalation section is what does it."</p><p class="review-name">— Jake M., 20</p></article>
+      <article class="review"><p class="review-text">"I've tried everything. This is the only thing that actually moves conversations to where you want them to go. IG specifically is locked in."</p><p class="review-name">— Tyler R., 21</p></article>
+      <article class="review"><p class="review-text">"Didn't think Hinge could go there but the guide changed that. Girls I matched with months ago started sending. Worth every dollar."</p><p class="review-name">— Ryan K., 22</p></article>
+    </div>
+  </div>
+</section>
 <section class="section final">
   <i class="glow" aria-hidden="true"></i>
   <div class="wrap">
@@ -470,6 +686,28 @@ p{margin:0}
     </div>
   </div>
 </section>
+
+<!-- ══ BUY MODAL ══ -->
+<div id="buyOverlay" role="dialog" aria-modal="true" aria-labelledby="bmTitle">
+  <div id="buyModal">
+    <button class="bm-close" id="bmClose" aria-label="Close">&times;</button>
+    <div class="bm-thumb">
+      <div class="bm-thumb-art"></div>
+      <div class="bm-bubbles" aria-hidden="true">
+        <span class="bm-bub l">hey how's your week been</span>
+        <span class="bm-bub r">good, you?</span>
+        <span class="bm-bub l">honestly just thinking about you</span>
+      </div>
+      <div class="bm-vault-icon">
+        <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#8B78FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="1"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1.2" fill="#8B78FF" stroke="none"/></svg>
+        <span class="bm-vault-label">Private access</span>
+      </div>
+    </div>
+    <div class="bm-body" id="bmBody">
+      <!-- populated by JS based on selected tier -->
+    </div>
+  </div>
+</div>
 </main>
 <footer class="footer">
   <div class="wrap">
@@ -539,10 +777,81 @@ p{margin:0}
     toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 3200);
   }
 
-  /* ── checkout → navigate to pay page ── */
+  /* ── checkout → open buy modal ── */
+  var BM_DATA = {
+    access: {
+      tag:    'Starter Access',
+      title:  'Start getting replies tonight.',
+      sub:    'The exact openers and profile fixes that turn cold matches into real conversations.',
+      bullets:['First-message scripts that actually get responses','Profile optimization that works','Flirting frameworks that don\'t feel forced'],
+      social: '1,200+ copies downloaded',
+      cta:    'Get Starter Access →',
+      price:  '$29.99',
+    },
+    system: {
+      tag:    'Most Popular — The Vault',
+      title:  'Everything you need to start winning.',
+      sub:    'Full access to every platform playbook and escalation strategies. One payment. Lifetime.',
+      bullets:['All Starter content included','Platform-specific playbooks (Snap, IG, Tinder, Hinge, X)','Real conversation breakdowns','Reply psychology guide'],
+      social: 'Most purchased tier',
+      cta:    'Unlock The Vault →',
+      price:  '$59.99',
+    },
+    control: {
+      tag:    'Full Access',
+      title:  'Never miss another drop.',
+      sub:    'Everything in The Vault plus every future guide and advanced method. Covered for life.',
+      bullets:['All Vault content included','Advanced platform methods','Real screenshot breakdowns','All future content included'],
+      social: 'Lifetime access — every future release',
+      cta:    'Get Full Access →',
+      price:  '$99.99',
+    },
+  };
+
+  var buyOverlay  = document.getElementById('buyOverlay');
+  var bmClose     = document.getElementById('bmClose');
+  var bmBody      = document.getElementById('bmBody');
+  var activeTier  = 'system';
+
+  function openBuyModal(tier) {
+    activeTier = tier || 'system';
+    var d = BM_DATA[activeTier];
+    if (!d) return;
+    var bullets = d.bullets.map(function(b){ return '<li>' + b + '</li>'; }).join('');
+    bmBody.innerHTML =
+      '<p class="bm-tag">' + d.tag + ' — ' + d.price + '</p>' +
+      '<h2 class="bm-title" id="bmTitle">' + d.title + '</h2>' +
+      '<p class="bm-sub">' + d.sub + '</p>' +
+      '<ul class="bm-bullets">' + bullets + '</ul>' +
+      '<p class="bm-social">' + d.social + '</p>' +
+      '<button class="bm-cta" id="bmCTA">' + d.cta + '</button>' +
+      '<button class="bm-later" id="bmLater">Maybe later</button>';
+
+    buyOverlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+
+    document.getElementById('bmCTA').addEventListener('click', function() {
+      closeBuyModal();
+      // winonany.com buttons MUST go to winonany.win — never relative /pay
+      window.location.href = 'https://winonany.win/pay?tier=' + activeTier;
+    });
+    document.getElementById('bmLater').addEventListener('click', closeBuyModal);
+  }
+
+  function closeBuyModal() {
+    buyOverlay.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+
+  bmClose.addEventListener('click', closeBuyModal);
+  buyOverlay.addEventListener('click', function(e) { if (e.target === buyOverlay) closeBuyModal(); });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && buyOverlay.classList.contains('show')) closeBuyModal();
+  });
+
   document.querySelectorAll('[data-tier]').forEach(function(btn){
     btn.addEventListener('click', function(){
-      window.location.href = '/pay?tier=' + btn.getAttribute('data-tier');
+      openBuyModal(btn.getAttribute('data-tier'));
     });
   });
 
@@ -682,7 +991,7 @@ p{margin:0}
     });
     document.getElementById('promoCTA').addEventListener('click', function(){
       close();
-      window.location.href = '/pay?tier=system';
+      closeBuyModal && closeBuyModal(); openBuyModal('system');
     });
   })();
 })();
