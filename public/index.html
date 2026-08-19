@@ -142,160 +142,100 @@ p{margin:0}
   gap:10px;min-height:52px;padding:0 26px;
   font-size:15px;font-weight:600;letter-spacing:.01em;
   border:1px solid transparent;
-  position:relative;overflow:hidden;isolation:isolate;
-  white-space:nowrap;
+  position:relative;
+  white-space:nowrap;cursor:pointer;
   -webkit-tap-highlight-color:transparent;touch-action:manipulation;
-  transition:
-    background    .32s cubic-bezier(.16,1,.3,1),
-    border-color  .32s cubic-bezier(.16,1,.3,1),
-    box-shadow    .32s cubic-bezier(.16,1,.3,1),
-    color         .22s ease,
-    transform     .18s cubic-bezier(.16,1,.3,1);
-  will-change:box-shadow,transform;
+  transition:background .28s cubic-bezier(.16,1,.3,1),
+             border-color .28s cubic-bezier(.16,1,.3,1),
+             box-shadow .28s cubic-bezier(.16,1,.3,1),
+             color .22s ease,
+             transform .16s cubic-bezier(.16,1,.3,1);
 }
 
-/* ── Primary — unlocking something exclusive ──
-   Design intent:
-   • Resting: flat solid purple — confident, not trying too hard
-   • A top-edge 1px inner highlight (::before) suggests a lit surface
-     without faking 3D — like light catching the top of a physical key
-   • Hover: colour brightens, a diffuse underglow blooms outward,
-     and a diagonal shimmer sweeps left→right — the "unlock" moment
-   • Active: slight downpress via scale, glow compresses               */
+/* ── PRIMARY ─────────────────────────────────────────────────────
+   Depth comes entirely from box-shadow stacking — no pseudo-elements,
+   no overflow tricks, nothing that can ghost text.
+   Three shadow layers at rest:
+     1. Inset top-edge highlight: suggests a lit upper face
+     2. Inset bottom shadow: grounds the button
+     3. Outer glow seed (0 spread, invisible): pre-allocates the
+        compositor layer so the hover glow doesn't cause a repaint jump
+   On hover: glow expands through two radii (close + far) for real
+   bloom depth. Colour steps to --accent-lift. No transforms.
+   On active: scale down slightly, glow tightens.
+   ──────────────────────────────────────────────────────────────── */
 .btn-primary{
   background:var(--accent);
   color:#fff;
-  /* Hairline top-edge inner light — readable at any bg */
   box-shadow:
-    inset 0  1px 0 rgba(255,255,255,.14),  /* top inner highlight  */
-    inset 0 -1px 0 rgba(0,0,0,.22),        /* bottom inner shadow  */
-    0 0 0 0 rgba(110,86,248,0);            /* glow placeholder     */
-}
-/* Diagonal shimmer overlay — sweeps on hover */
-.btn-primary::before{
-  content:"";
-  position:absolute;inset:0;z-index:1;
-  background:linear-gradient(
-    105deg,
-    transparent 28%,
-    rgba(255,255,255,.11) 44%,
-    rgba(255,255,255,.15) 50%,
-    rgba(255,255,255,.11) 56%,
-    transparent 72%
-  );
-  transform:translateX(-110%) skewX(-8deg);
-  transition:transform .62s cubic-bezier(.16,1,.3,1);
-  pointer-events:none;
+    inset 0  1px 0 rgba(255,255,255,.16),
+    inset 0 -1px 0 rgba(0,0,0,.24),
+    0 0 0 0 rgba(110,86,248,0);
 }
 .btn-primary:hover{
   background:var(--accent-lift);
   box-shadow:
-    inset 0  1px 0 rgba(255,255,255,.20),
+    inset 0  1px 0 rgba(255,255,255,.22),
     inset 0 -1px 0 rgba(0,0,0,.18),
-    0  2px 28px -4px rgba(110,86,248,.55),  /* close diffuse glow  */
-    0 14px 52px -14px rgba(110,86,248,.72); /* far ambient bloom   */
-}
-.btn-primary:hover::before{
-  transform:translateX(110%) skewX(-8deg);
+    0  0 22px -2px rgba(110,86,248,.50),
+    0  8px 40px -8px rgba(110,86,248,.65);
 }
 .btn-primary:active{
   transform:scale(.972);
   box-shadow:
     inset 0  1px 0 rgba(255,255,255,.10),
-    inset 0 -1px 0 rgba(0,0,0,.28),
-    0 0 16px -4px rgba(110,86,248,.4);
-  transition-duration:.08s;
+    inset 0 -1px 0 rgba(0,0,0,.30),
+    0  0 14px -4px rgba(110,86,248,.40);
+  transition-duration:.10s;
 }
 
-/* ── Ghost — clean and secondary, not weak ──
-   Design intent:
-   • Resting: 1px border at line-2 opacity — clean, reads as premium
-     because it's barely there. A very faint inner-top highlight.
-   • Hover: border brightens with a faint violet tint, background
-     gains a whisper of violet (not white — white reads as cheap).
-     No glow — this button is deferring to primary.
-   • The text itself brightens on hover, keeping the hierarchy clear. */
+/* ── GHOST ───────────────────────────────────────────────────────
+   Resting: thin border at --line-2, text at --muted.
+   Hover: border steps to a low-opacity violet, text snaps to --text,
+   background gains a whisper of violet. A subtle glow ties it to
+   the accent family without competing with primary.
+   ──────────────────────────────────────────────────────────────── */
 .btn-ghost{
   border-color:var(--line-2);
   color:var(--muted);
   background:transparent;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-}
-.btn-ghost::before{
-  content:"";
-  position:absolute;inset:0;z-index:1;
-  background:linear-gradient(
-    105deg,
-    transparent 30%,
-    rgba(255,255,255,.05) 46%,
-    rgba(255,255,255,.07) 50%,
-    rgba(255,255,255,.05) 54%,
-    transparent 70%
-  );
-  transform:translateX(-110%) skewX(-8deg);
-  transition:transform .58s cubic-bezier(.16,1,.3,1);
-  pointer-events:none;
+  box-shadow:none;
 }
 .btn-ghost:hover{
-  border-color:rgba(139,120,255,.55);
+  border-color:rgba(110,86,248,.50);
   color:var(--text);
-  background:rgba(110,86,248,.06);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.10),
-    0 0 18px -6px rgba(110,86,248,.18);
-}
-.btn-ghost:hover::before{
-  transform:translateX(110%) skewX(-8deg);
+  background:rgba(110,86,248,.07);
+  box-shadow:0 0 16px -6px rgba(110,86,248,.22),
+             inset 0 1px 0 rgba(255,255,255,.06);
 }
 .btn-ghost:active{
-  transform:scale(.972);
-  background:rgba(110,86,248,.10);
-  border-color:rgba(139,120,255,.70);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
-  transition-duration:.08s;
+  transform:scale(.974);
+  background:rgba(110,86,248,.12);
+  border-color:rgba(110,86,248,.70);
+  transition-duration:.10s;
 }
 
-/* ── Small variant — same system, tighter ── */
+/* ── SMALL VARIANT ── */
 .btn-sm{min-height:40px;padding:0 16px;font-size:13px}
 
-/* ── Arrow interaction ──────────────────────
-   Resting: arrow sits naturally in flow.
-   Hover: slides right 5px with an ease-out,
-   then a very faint ghost trails behind it
-   (opacity keyframe on the ::after pseudo)
-   to imply motion without literal animation. */
+/* ── ARROW ───────────────────────────────────────────────────────
+   Simple 5px slide. No pseudo-elements, no content tricks.
+   ──────────────────────────────────────────────────────────────── */
 .btn .arw{
   display:inline-flex;align-items:center;
-  transition:transform .38s cubic-bezier(.16,1,.3,1);
-  position:relative;
+  transition:transform .34s cubic-bezier(.16,1,.3,1);
 }
 .btn:hover .arw{transform:translateX(5px)}
-/* Subtle trail — ghost arrow behind the real one */
-.btn .arw::after{
-  content:attr(aria-hidden);
-  position:absolute;right:100%;margin-right:2px;
-  opacity:0;
-  transition:opacity .38s cubic-bezier(.16,1,.3,1),
-             transform .38s cubic-bezier(.16,1,.3,1);
-  transform:translateX(-4px);
-  pointer-events:none;
-}
-.btn:hover .arw::after{
-  opacity:.22;
-  transform:translateX(0);
-}
 
-/* ── Focus visible — keyboard accessibility ─ */
+/* ── FOCUS ── */
 .btn:focus-visible{
   outline:2px solid var(--accent-lift);
   outline-offset:3px;
 }
 
-/* ── Reduced motion ─── collapse transitions ─ */
+/* ── REDUCED MOTION ── */
 @media(prefers-reduced-motion:reduce){
-  .btn{transition:background .15s,border-color .15s,color .15s}
-  .btn-primary::before,.btn-ghost::before{display:none}
-  .btn .arw,.btn .arw::after{transition:none}
+  .btn,.btn .arw{transition:background .12s,border-color .12s,color .12s}
 }
 @media(max-width:480px){
   .hero-cta .btn{flex:1 1 100%}
@@ -672,44 +612,23 @@ p{margin:0}
   background:var(--accent);color:#fff;
   font-size:15.5px;font-weight:700;letter-spacing:.01em;
   border:0;cursor:pointer;
-  position:relative;overflow:hidden;isolation:isolate;
   box-shadow:
-    inset 0  1px 0 rgba(255,255,255,.14),
-    inset 0 -1px 0 rgba(0,0,0,.22),
+    inset 0  1px 0 rgba(255,255,255,.16),
+    inset 0 -1px 0 rgba(0,0,0,.24),
     0 0 0 0 rgba(110,86,248,0);
-  transition:
-    background    .32s cubic-bezier(.16,1,.3,1),
-    box-shadow    .32s cubic-bezier(.16,1,.3,1),
-    transform     .18s cubic-bezier(.16,1,.3,1);
-}
-.bm-cta::after{
-  content:"";position:absolute;inset:0;z-index:1;
-  background:linear-gradient(
-    105deg,
-    transparent 28%,
-    rgba(255,255,255,.11) 44%,
-    rgba(255,255,255,.15) 50%,
-    rgba(255,255,255,.11) 56%,
-    transparent 72%
-  );
-  transform:translateX(-110%) skewX(-8deg);
-  transition:transform .62s cubic-bezier(.16,1,.3,1);
-  pointer-events:none;
+  transition:background .28s cubic-bezier(.16,1,.3,1),
+             box-shadow .28s cubic-bezier(.16,1,.3,1),
+             transform .16s cubic-bezier(.16,1,.3,1);
 }
 .bm-cta:hover{
   background:var(--accent-lift);
   box-shadow:
-    inset 0  1px 0 rgba(255,255,255,.20),
+    inset 0  1px 0 rgba(255,255,255,.22),
     inset 0 -1px 0 rgba(0,0,0,.18),
-    0  2px 28px -4px rgba(110,86,248,.55),
-    0 14px 52px -14px rgba(110,86,248,.72);
+    0  0 22px -2px rgba(110,86,248,.50),
+    0  8px 40px -8px rgba(110,86,248,.65);
 }
-.bm-cta:hover::after{transform:translateX(110%) skewX(-8deg)}
-.bm-cta:active{transform:scale(.972);transition-duration:.08s}
-@media(prefers-reduced-motion:reduce){
-  .bm-cta{transition:background .15s}
-  .bm-cta::after{display:none}
-}
+.bm-cta:active{transform:scale(.972);transition-duration:.10s}
 .bm-later{
   display:block;text-align:center;margin-top:14px;
   font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
