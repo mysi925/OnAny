@@ -1,14 +1,28 @@
 'use strict';
 require('dotenv').config();
 
-const express      = require('express');
-const path         = require('path');
-const fs           = require('fs');
-const cookieParser = require('cookie-parser');
+const express = require('express');
+const path    = require('path');
+const fs      = require('fs');
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DOMAIN ARCHITECTURE — DO NOT CHANGE REDIRECT BEHAVIOUR WITHOUT READING THIS
+//
+// winonany.win  = CHECKOUT ONLY. Serves: pay.html, success.html, expired.html,
+//                 /api/charge, /api/download, /api/config, Square SDK.
+//                 NEVER redirects to winonany.com. NEVER leaks Referer.
+//
+// winonany.com  = MARKETING ONLY. Serves: index.html only.
+//                 NEVER handles payments. NEVER touches Square.
+//
+// Both domains hit this same Railway process, routed by req.hostname.
+// The login gate has been REMOVED — no /login, /portal, /api/auth routes.
+// After payment, users stay on winonany.win for download. No cross-domain jump.
+// Square only ever sees requests originating from winonany.win.
+// ══════════════════════════════════════════════════════════════════════════════
 
 const chargeRoute   = require('./api/charge');
 const webhookRoute  = require('./api/webhook');
-const authRoute     = require('./api/auth');
 const downloadRoute = require('./api/download');
 const { getOrderBySlug, isTokenValid } = require('./lib/tokens');
 
@@ -16,15 +30,17 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 
 // ── Body parsing ───────────────────────────────────────────────────────────────
-app.use(cookieParser());
 app.use('/api/webhook', express.raw({ type: 'application/json' }));
 app.use('/api', express.json());
 
-// ── Security headers ───────────────────────────────────────────────────────────
+// ── Security / privacy headers ─────────────────────────────────────────────────
+// Referrer-Policy: no-referrer — Square (and any third party) sees NO referrer
+// header from winonany.win requests. Zero leakage of winonany.com URL or path.
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader('Permissions-Policy', 'payment=*');
   next();
 });
 
@@ -40,12 +56,10 @@ app.get('/api/config', (req, res) => {
 // ── API routes ─────────────────────────────────────────────────────────────────
 app.use('/api', chargeRoute);
 app.use('/api', webhookRoute);
-app.use('/api', authRoute);
 app.use('/api', downloadRoute);
+// auth routes REMOVED — no login gate
 
 // ── Apple Pay domain verification ─────────────────────────────────────────────
-// Read + strip trailing whitespace so the byte count is Square-exact regardless
-// of what's sitting on disk (git, editors, and CI all love to add a trailing \n).
 app.get('/.well-known/apple-developer-merchantid-domain-association', (req, res) => {
   try {
     const raw     = fs.readFileSync(
@@ -56,33 +70,37 @@ app.get('/.well-known/apple-developer-merchantid-domain-association', (req, res)
     res.setHeader('Content-Length', payload.length);
     res.end(payload);
   } catch (err) {
-    console.error('[apple-pay] failed to read domain association file:', err.message);
+    console.error('[apple-pay] domain association file missing:', err.message);
     res.status(500).end();
   }
 });
 
-// ── Page routes (before static so hostname check fires first) ─────────────────
+// ── Page routes ────────────────────────────────────────────────────────────────
 const page = (file) => (req, res) =>
   res.sendFile(path.join(__dirname, 'public', file));
 
 app.get('/', (req, res) => {
-  if (req.hostname === 'winonany.com') {
-    // Marketing domain → landing page
+  if (req.hostname === 'winonany.com' || req.hostname === 'www.winonany.com') {
     return res.sendFile(path.join(__dirname, 'public/index.html'));
   }
-  // Payment domain (winonany.win / Railway subdomain) → checkout
+  // winonany.win and Railway preview URLs → checkout
   return res.redirect(302, '/pay?tier=system');
 });
-app.get('/pay',     page('pay.html'));
-app.get('/login',   page('login.html'));
-app.get('/portal',  page('portal.html'));
-app.get('/expired', page('expired.html'));
 
-// ── Static assets — index:false so express.static never intercepts '/' ────────
+app.get('/pay',     page('pay.html'));
+app.get('/expired', page('expired.html'));
+app.get('/contact', page('contact.html'));
+app.get('/terms',   page('terms.html'));
+app.get('/privacy', page('privacy.html'));
+
+// Login/portal routes REMOVED — no login gate
+
+// ── Static assets ──────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'allow', index: false }));
 
-// ── Secure success route ───────────────────────────────────────────────────────
-// Randomised slug prevents direct access — token validated on every request.
+// ── Success route — stays on winonany.win, no cross-domain jump ────────────────
+// /s/:slug validates the token server-side and injects it into success.html.
+// The entire download flow completes on .win — winonany.com is never referenced.
 app.get('/s/:slug', async (req, res) => {
   try {
     const order = await getOrderBySlug(req.params.slug);
@@ -115,11 +133,9 @@ window.__WOA__ = {
 });
 
 // ── 404 ────────────────────────────────────────────────────────────────────────
-app.use((req, res) => {
-  res.status(404).send('Not found.');
-});
+app.use((req, res) => res.status(404).send('Not found.'));
 
 // ── Start ──────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
-  console.log(`WinOnAny on :${PORT}  [${process.env.SQUARE_ENVIRONMENT || 'sandbox'}]`);
+  console.log(`WinOnAny :${PORT}  [${process.env.SQUARE_ENVIRONMENT || 'sandbox'}]`);
 });
